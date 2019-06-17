@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2006-2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,50 @@
 namespace mbed {
 
 SingletonPtr<PlatformMutex> AnalogIn::_mutex;
+
+AnalogIn::AnalogIn(PinName pin)
+{
+    lock();
+    analogin_init(&_adc, pin);
+    unlock();
+}
+
+float AnalogIn::read()
+{
+    lock();
+    float ret = analogin_read(&_adc);
+    unlock();
+    return ret;
+}
+
+unsigned short AnalogIn::read_u16()
+{
+    lock();
+    unsigned short ret = analogin_read_u16(&_adc);
+    unlock();
+    return ret;
+}
+
+operator AnalogIn::float()
+{
+    // Underlying call is thread safe
+    return read();
+}
+
+virtual AnalogIn::~AnalogIn()
+{
+    // Do nothing
+}
+
+virtual void AnalogIn::lock()
+{
+    _mutex->lock();
+}
+
+virtual void AnalogIn::unlock()
+{
+    _mutex->unlock();
+}
 
 };
 
