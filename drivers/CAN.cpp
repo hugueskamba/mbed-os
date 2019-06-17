@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2006-2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,48 @@
 #include "platform/mbed_power_mgmt.h"
 
 namespace mbed {
+
+CANMessage::CANMessage() : CAN_Message()
+{
+    len    = 8U;
+    type   = CANData;
+    format = CANStandard;
+    id     = 0U;
+    memset(data, 0, 8);
+}
+
+CANMessage::CANMessage(
+    unsigned int _id, const unsigned char *_data, unsigned char _len = 8,
+    CANType _type = CANData, CANFormat _format = CANStandard
+)
+{
+    len    = _len & 0xF;
+    type   = _type;
+    format = _format;
+    id     = _id;
+    memcpy(data, _data, _len);
+}
+
+CANMessage::CANMessage(
+    unsigned int _id, const char *_data, unsigned char _len = 8,
+    CANType _type = CANData, CANFormat _format = CANStandard
+)
+{
+    len    = _len & 0xF;
+    type   = _type;
+    format = _format;
+    id     = _id;
+    memcpy(data, _data, _len);
+}
+
+CANMessage::CANMessage(unsigned int _id, CANFormat _format = CANStandard)
+{
+    len    = 0;
+    type   = CANRemote;
+    format = _format;
+    id     = _id;
+    memset(data, 0, 8);
+}
 
 CAN::CAN(PinName rd, PinName td) : _can(), _irq()
 {
