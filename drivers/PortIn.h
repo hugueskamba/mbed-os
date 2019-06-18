@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2006-2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,6 @@
 #if DEVICE_PORTIN || defined(DOXYGEN_ONLY)
 
 #include "hal/port_api.h"
-#include "platform/mbed_critical.h"
 
 namespace mbed {
 /** \addtogroup drivers */
@@ -61,40 +60,24 @@ public:
      *  @param port Port to connect to (as defined in target's PortNames.h)
      *  @param mask Bitmask defines which port pins should be an input (0 - ignore, 1 - include)
         */
-    PortIn(PortName port, int mask = 0xFFFFFFFF)
-    {
-        core_util_critical_section_enter();
-        port_init(&_port, port, mask, PIN_INPUT);
-        core_util_critical_section_exit();
-    }
+    PortIn(PortName port, int mask = 0xFFFFFFFF);
 
     /** Read the value input to the port
      *
      *  @returns
      *    An integer with each bit corresponding to the associated pin value
      */
-    int read()
-    {
-        return port_read(&_port);
-    }
+    int read();
 
     /** Set the input pin mode
      *
      *  @param mode PullUp, PullDown, PullNone, OpenDrain
      */
-    void mode(PinMode mode)
-    {
-        core_util_critical_section_enter();
-        port_mode(&_port, mode);
-        core_util_critical_section_exit();
-    }
+    void mode(PinMode mode);
 
     /** A shorthand for read()
      */
-    operator int()
-    {
-        return read();
-    }
+    operator int();
 
 private:
     port_t _port;
