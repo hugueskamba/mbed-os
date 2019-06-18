@@ -48,37 +48,37 @@ float AnalogOut::read()
     return ret;
 }
 
-AnalogOut AnalogOut::&operator= (float percent)
+AnalogOut &AnalogOut::operator= (float percent)
 {
     // Underlying write call is thread safe
     write(percent);
     return *this;
 }
 
-AnalogOut AnalogOut::&operator= (AnalogOut &rhs)
+AnalogOut &AnalogOut::operator= (AnalogOut &rhs)
 {
     // Underlying write call is thread safe
     write(rhs.read());
     return *this;
 }
 
-operator AnalogOut::float()
+AnalogOut::operator float()
 {
     // Underlying read call is thread safe
     return read();
 }
 
-virtual AnalogOut::~AnalogOut()
+AnalogOut::~AnalogOut()
 {
     // Do nothing
 }
 
-virtual void AnalogOut::lock()
+void AnalogOut::lock()
 {
     _mutex.lock();
 }
 
-virtual void AnalogOut::unlock()
+void AnalogOut::unlock()
 {
     _mutex.unlock();
 }
