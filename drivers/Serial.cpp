@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2006-2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 #include "drivers/Serial.h"
-#include "platform/mbed_wait_api.h"
 
 #if DEVICE_SERIAL
 
