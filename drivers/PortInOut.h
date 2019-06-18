@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2006-2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,6 @@
 #if DEVICE_PORTINOUT || defined(DOXYGEN_ONLY)
 
 #include "hal/port_api.h"
-#include "platform/mbed_critical.h"
 
 namespace mbed {
 /** \addtogroup drivers */
@@ -40,86 +39,49 @@ public:
      *  @param port Port to connect to (Port0-Port5)
      *  @param mask A bitmask to identify which bits in the port should be included (0 - ignore)
      */
-    PortInOut(PortName port, int mask = 0xFFFFFFFF)
-    {
-        core_util_critical_section_enter();
-        port_init(&_port, port, mask, PIN_INPUT);
-        core_util_critical_section_exit();
-    }
+    PortInOut(PortName port, int mask = 0xFFFFFFFF);
 
     /** Write the value to the output port
      *
      *  @param value An integer specifying a bit to write for every corresponding port pin
      */
-    void write(int value)
-    {
-        port_write(&_port, value);
-    }
+    void write(int value);
 
     /** Read the value currently output on the port
      *
      *  @returns
      *    An integer with each bit corresponding to associated port pin setting
      */
-    int read()
-    {
-        return port_read(&_port);
-    }
+    int read();
 
     /** Set as an output
      */
-    void output()
-    {
-        core_util_critical_section_enter();
-        port_dir(&_port, PIN_OUTPUT);
-        core_util_critical_section_exit();
-    }
+    void output();
 
     /** Set as an input
      */
-    void input()
-    {
-        core_util_critical_section_enter();
-        port_dir(&_port, PIN_INPUT);
-        core_util_critical_section_exit();
-    }
+    void input();
 
     /** Set the input pin mode
      *
      *  @param mode PullUp, PullDown, PullNone, OpenDrain
      */
-    void mode(PinMode mode)
-    {
-        core_util_critical_section_enter();
-        port_mode(&_port, mode);
-        core_util_critical_section_exit();
-    }
+    void mode(PinMode mode);
 
     /** A shorthand for write()
      * \sa PortInOut::write()
      */
-    PortInOut &operator= (int value)
-    {
-        write(value);
-        return *this;
-    }
+    PortInOut &operator= (int value);
 
     /** A shorthand for write()
      * \sa PortInOut::write()
      */
-    PortInOut &operator= (PortInOut &rhs)
-    {
-        write(rhs.read());
-        return *this;
-    }
+    PortInOut &operator= (PortInOut &rhs);
 
     /** A shorthand for read()
      * \sa PortInOut::read()
      */
-    operator int()
-    {
-        return read();
-    }
+    operator int();
 
 private:
     port_t _port;
