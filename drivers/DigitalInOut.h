@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2006-2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,6 @@
 #include "platform/platform.h"
 
 #include "hal/gpio_api.h"
-#include "platform/mbed_critical.h"
 
 namespace mbed {
 /** \addtogroup drivers */
@@ -37,11 +36,7 @@ public:
      *
      *  @param pin DigitalInOut pin to connect to
      */
-    DigitalInOut(PinName pin) : gpio()
-    {
-        // No lock needed in the constructor
-        gpio_init_in(&gpio, pin);
-    }
+    DigitalInOut(PinName pin);
 
     /** Create a DigitalInOut connected to the specified pin
      *
@@ -50,22 +45,16 @@ public:
      *  @param mode the initial mode of the pin
      *  @param value the initial value of the pin if is an output
      */
-    DigitalInOut(PinName pin, PinDirection direction, PinMode mode, int value) : gpio()
-    {
-        // No lock needed in the constructor
-        gpio_init_inout(&gpio, pin, direction, mode, value);
-    }
+    DigitalInOut(
+        PinName pin, PinDirection direction, PinMode mode, int value
+    );
 
     /** Set the output, specified as 0 or 1 (int)
      *
      *  @param value An integer specifying the pin output value,
      *      0 for logical 0, 1 (or any other non-zero value) for logical 1
      */
-    void write(int value)
-    {
-        // Thread safe / atomic HAL call
-        gpio_write(&gpio, value);
-    }
+    void write(int value);
 
     /** Return the output setting, represented as 0 or 1 (int)
      *
@@ -73,40 +62,21 @@ public:
      *    an integer representing the output setting of the pin if it is an output,
      *    or read the input if set as an input
      */
-    int read()
-    {
-        // Thread safe / atomic HAL call
-        return gpio_read(&gpio);
-    }
+    int read();
 
     /** Set as an output
      */
-    void output()
-    {
-        core_util_critical_section_enter();
-        gpio_dir(&gpio, PIN_OUTPUT);
-        core_util_critical_section_exit();
-    }
+    void output();
 
     /** Set as an input
      */
-    void input()
-    {
-        core_util_critical_section_enter();
-        gpio_dir(&gpio, PIN_INPUT);
-        core_util_critical_section_exit();
-    }
+    void input();
 
     /** Set the input pin mode
      *
      *  @param pull PullUp, PullDown, PullNone, OpenDrain
      */
-    void mode(PinMode pull)
-    {
-        core_util_critical_section_enter();
-        gpio_mode(&gpio, pull);
-        core_util_critical_section_exit();
-    }
+    void mode(PinMode pull);
 
     /** Return the output setting, represented as 0 or 1 (int)
      *
@@ -114,11 +84,7 @@ public:
      *    Non zero value if pin is connected to uc GPIO
      *    0 if gpio object was initialized with NC
      */
-    int is_connected()
-    {
-        // Thread safe / atomic HAL call
-        return gpio_is_connected(&gpio);
-    }
+    int is_connected();
 
     /** A shorthand for write()
      * \sa DigitalInOut::write()
@@ -130,24 +96,13 @@ public:
      *      inout = button;     // Equivalent to inout.write(button.read())
      * @endcode
      */
-    DigitalInOut &operator= (int value)
-    {
-        // Underlying write is thread safe
-        write(value);
-        return *this;
-    }
+    DigitalInOut &operator= (int value);
 
     /**A shorthand for write() using the assignment operator which copies the
      * state from the DigitalInOut argument.
      * \sa DigitalInOut::write()
      */
-    DigitalInOut &operator= (DigitalInOut &rhs)
-    {
-        core_util_critical_section_enter();
-        write(rhs.read());
-        core_util_critical_section_exit();
-        return *this;
-    }
+    DigitalInOut &operator= (DigitalInOut &rhs);
 
     /** A shorthand for read()
      * \sa DigitalInOut::read()
@@ -159,11 +114,7 @@ public:
      *      led = inout;   // Equivalent to led.write(inout.read())
      * @endcode
      */
-    operator int()
-    {
-        // Underlying call is thread safe
-        return read();
-    }
+    operator int();
 
 protected:
 #if !defined(DOXYGEN_ONLY)
