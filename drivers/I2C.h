@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2015 ARM Limited
+ * Copyright (c) 2006-2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@
 #if DEVICE_I2C_ASYNCH
 #include "platform/CThunk.h"
 #include "hal/dma_api.h"
-#include "platform/FunctionPointer.h"
+#include "platform/Callback.h"
 #endif
 
 namespace mbed {
@@ -193,7 +193,11 @@ public:
      *
      * @returns Zero if the transfer has started, or -1 if I2C peripheral is busy
      */
-    int transfer(int address, const char *tx_buffer, int tx_length, char *rx_buffer, int rx_length, const event_callback_t &callback, int event = I2C_EVENT_TRANSFER_COMPLETE, bool repeated = false);
+    int transfer(
+        int address, const char *tx_buffer, int tx_length, char *rx_buffer,
+        int rx_length, const event_callback_t &callback,
+        int event = I2C_EVENT_TRANSFER_COMPLETE, bool repeated = false
+    );
 
     /** Abort the ongoing I2C transfer
      */
