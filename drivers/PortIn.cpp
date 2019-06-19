@@ -24,7 +24,7 @@
 
 namespace mbed {
 
-PortIn::PortIn(PortName port, int mask = 0xFFFFFFFF)
+PortIn::PortIn(PortName port, int mask)
 {
     core_util_critical_section_enter();
     port_init(&_port, port, mask, PIN_INPUT);

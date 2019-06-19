@@ -24,7 +24,7 @@
 
 namespace mbed {
 
-PortOut::PortOut(PortName port, int mask = 0xFFFFFFFF)
+PortOut::PortOut(PortName port, int mask)
 {
     core_util_critical_section_enter();
     port_init(&_port, port, mask, PIN_OUTPUT);
