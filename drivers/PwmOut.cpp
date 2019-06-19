@@ -25,14 +25,14 @@
 
 namespace mbed {
 
-PmwOut::PmwOut(PinName pin) : _deep_sleep_locked(false)
+PwmOut::PwmOut(PinName pin) : _deep_sleep_locked(false)
 {
     core_util_critical_section_enter();
     pwmout_init(&_pwm, pin);
     core_util_critical_section_exit();
 }
 
-PmwOut::~PwmOut()
+PwmOut::~PwmOut()
 {
     core_util_critical_section_enter();
     pwmout_free(&_pwm);
@@ -40,7 +40,7 @@ PmwOut::~PwmOut()
     core_util_critical_section_exit();
 }
 
-void PmwOut::write(float value)
+void PwmOut::write(float value)
 {
     core_util_critical_section_enter();
     lock_deep_sleep();
@@ -48,7 +48,7 @@ void PmwOut::write(float value)
     core_util_critical_section_exit();
 }
 
-float PmwOut::read()
+float PwmOut::read()
 {
     core_util_critical_section_enter();
     float val = pwmout_read(&_pwm);
@@ -56,69 +56,69 @@ float PmwOut::read()
     return val;
 }
 
-void PmwOut::period(float seconds)
+void PwmOut::period(float seconds)
 {
     core_util_critical_section_enter();
     pwmout_period(&_pwm, seconds);
     core_util_critical_section_exit();
 }
 
-void PmwOut::period_ms(int ms)
+void PwmOut::period_ms(int ms)
 {
     core_util_critical_section_enter();
     pwmout_period_ms(&_pwm, ms);
     core_util_critical_section_exit();
 }
 
-void PmwOut::period_us(int us)
+void PwmOut::period_us(int us)
 {
     core_util_critical_section_enter();
     pwmout_period_us(&_pwm, us);
     core_util_critical_section_exit();
 }
 
-void PmwOut::pulsewidth(float seconds)
+void PwmOut::pulsewidth(float seconds)
 {
     core_util_critical_section_enter();
     pwmout_pulsewidth(&_pwm, seconds);
     core_util_critical_section_exit();
 }
 
-void PmwOut::pulsewidth_ms(int ms)
+void PwmOut::pulsewidth_ms(int ms)
 {
     core_util_critical_section_enter();
     pwmout_pulsewidth_ms(&_pwm, ms);
     core_util_critical_section_exit();
 }
 
-void PmwOut::pulsewidth_us(int us)
+void PwmOut::pulsewidth_us(int us)
 {
     core_util_critical_section_enter();
     pwmout_pulsewidth_us(&_pwm, us);
     core_util_critical_section_exit();
 }
 
-PwmOut &PmwOut::operator= (float value)
+PwmOut &PwmOut::operator= (float value)
 {
     // Underlying call is thread safe
     write(value);
     return *this;
 }
 
-PwmOut &PmwOut::operator= (PwmOut &rhs)
+PwmOut &PwmOut::operator= (PwmOut &rhs)
 {
     // Underlying call is thread safe
     write(rhs.read());
     return *this;
 }
 
-PmwOut::operator float()
+PwmOut::operator float()
 {
     // Underlying call is thread safe
     return read();
 }
 
-void PmwOut::lock_deep_sleep()
+void PwmOut::lock_deep_sleep()
 {
     if (_deep_sleep_locked == false) {
         sleep_manager_lock_deep_sleep();
@@ -126,7 +126,7 @@ void PmwOut::lock_deep_sleep()
     }
 }
 
-void PmwOut::unlock_deep_sleep()
+void PwmOut::unlock_deep_sleep()
 {
     if (_deep_sleep_locked == true) {
         sleep_manager_unlock_deep_sleep();
