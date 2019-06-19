@@ -32,8 +32,8 @@ CANMessage::CANMessage() : CAN_Message()
 }
 
 CANMessage::CANMessage(
-    unsigned int _id, const unsigned char *_data, unsigned char _len = 8,
-    CANType _type = CANData, CANFormat _format = CANStandard
+    unsigned int _id, const unsigned char *_data, unsigned char _len,
+    CANType _type, CANFormat _format
 )
 {
     len    = _len & 0xF;
@@ -44,8 +44,8 @@ CANMessage::CANMessage(
 }
 
 CANMessage::CANMessage(
-    unsigned int _id, const char *_data, unsigned char _len = 8,
-    CANType _type = CANData, CANFormat _format = CANStandard
+    unsigned int _id, const char *_data, unsigned char _len,
+    CANType _type, CANFormat _format
 )
 {
     len    = _len & 0xF;
@@ -55,7 +55,7 @@ CANMessage::CANMessage(
     memcpy(data, _data, _len);
 }
 
-CANMessage::CANMessage(unsigned int _id, CANFormat _format = CANStandard)
+CANMessage::CANMessage(unsigned int _id, CANFormat _format)
 {
     len    = 0;
     type   = CANRemote;
