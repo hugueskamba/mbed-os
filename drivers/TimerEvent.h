@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2006-2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@
 #define MBED_TIMEREVENT_H
 
 #include "hal/ticker_api.h"
-#include "hal/us_ticker_api.h"
 #include "platform/NonCopyable.h"
 
 namespace mbed {
