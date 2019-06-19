@@ -39,7 +39,7 @@ class CANMessage : public CAN_Message {
 public:
     /** Creates empty CAN message.
      */
-    CANMessage() : CAN_Message();
+    CANMessage();
 
     /** Creates CAN message with specific content.
      *
@@ -50,8 +50,8 @@ public:
      *  @param _format  Data Format: Use enum CANFormat for valid parameter values
      */
     CANMessage(
-        unsigned int _id, const unsigned char *_data, unsigned char _len = 8,
-        CANType _type = CANData, CANFormat _format = CANStandard
+        unsigned int _id, const unsigned char *_data, unsigned char _len,
+        CANType _type, CANFormat _format
     );
 
 
@@ -64,8 +64,8 @@ public:
      *  @param _format  Data Format: Use enum CANFormat for valid parameter values
      */
     CANMessage(
-        unsigned int _id, const char *_data, unsigned char _len = 8,
-        CANType _type = CANData, CANFormat _format = CANStandard
+        unsigned int _id, const char *_data, unsigned char _len,
+        CANType _type, CANFormat _format
     );
 
     /** Creates CAN remote message.
@@ -73,7 +73,7 @@ public:
      *  @param _id      Message ID
      *  @param _format  Data Format: Use enum CANType for valid parameter values
      */
-    CANMessage(unsigned int _id, CANFormat _format = CANStandard);
+    CANMessage(unsigned int _id, CANFormat _format);
 };
 
 /** A can bus client, used for communicating with can devices
@@ -165,7 +165,7 @@ public:
      *    0 if no message arrived,
      *    1 if message arrived
      */
-    int read(CANMessage &msg, int handle = 0);
+    int read(CANMessage &msg, int handle);
 
     /** Reset CAN interface.
      *
@@ -209,7 +209,7 @@ public:
      *    0 if filter change failed or unsupported,
      *    new filter handle if successful
      */
-    int filter(unsigned int id, unsigned int mask, CANFormat format = CANAny, int handle = 0);
+    int filter(unsigned int id, unsigned int mask, CANFormat format, int handle);
 
     /**  Detects read errors - Used to detect read overflow errors.
      *
