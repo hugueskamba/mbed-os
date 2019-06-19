@@ -18,6 +18,7 @@
 #include "hal/ticker_api.h"
 #include "hal/us_ticker_api.h"
 #include "platform/mbed_critical.h"
+#include "platform/mbed_power_mgmt.h"
 
 namespace mbed {
 
