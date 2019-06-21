@@ -64,7 +64,10 @@ public:
      *  @note
      *    Either tx or rx may be specified as NC if unused
      */
-    RawSerial(PinName tx, PinName rx, int baud = MBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE);
+    RawSerial(PinName tx, PinName rx, int baud = MBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE) : SerialBase(tx, rx, baud)
+    {
+        // No lock needed in the constructor
+    }
 
     /** Write a char to the serial port
      *
@@ -96,11 +99,17 @@ protected:
 
     /* Acquire exclusive access to this serial port
      */
-    virtual void lock(void);
+    virtual void lock(void)
+    {
+        // No lock used - external synchronization required
+    }
 
     /* Release exclusive access to this serial port
      */
-    virtual void unlock(void);
+    virtual void unlock(void)
+    {
+        // No lock used - external synchronization required
+    }
 #endif
 };
 

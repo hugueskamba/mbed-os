@@ -164,11 +164,17 @@ public:
 
     /** Acquire exclusive access to this I2C bus
      */
-    virtual void lock(void);
+    virtual void lock(void)
+    {
+        _mutex->lock();
+    }
 
     /** Release exclusive access to this I2C bus
      */
-    virtual void unlock(void);
+    virtual void unlock(void)
+    {
+        _mutex->unlock();
+    }
 
     virtual ~I2C()
     {
@@ -193,11 +199,7 @@ public:
      *
      * @returns Zero if the transfer has started, or -1 if I2C peripheral is busy
      */
-    int transfer(
-        int address, const char *tx_buffer, int tx_length, char *rx_buffer,
-        int rx_length, const event_callback_t &callback,
-        int event = I2C_EVENT_TRANSFER_COMPLETE, bool repeated = false
-    );
+    int transfer(int address, const char *tx_buffer, int tx_length, char *rx_buffer, int rx_length, const event_callback_t &callback, int event = I2C_EVENT_TRANSFER_COMPLETE, bool repeated = false);
 
     /** Abort the ongoing I2C transfer
      */

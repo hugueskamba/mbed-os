@@ -21,36 +21,6 @@
 
 namespace mbed {
 
-DigitalOut::DigitalOut(PinName pin) : gpio()
-{
-    // No lock needed in the constructor
-    gpio_init_out(&gpio, pin);
-}
-
-DigitalOut::DigitalOut(PinName pin, int value) : gpio()
-{
-    // No lock needed in the constructor
-    gpio_init_out_ex(&gpio, pin, value);
-}
-
-void DigitalOut::write(int value)
-{
-    // Thread safe / atomic HAL call
-    gpio_write(&gpio, value);
-}
-
-int DigitalOut::read()
-{
-    // Thread safe / atomic HAL call
-    return gpio_read(&gpio);
-}
-
-int DigitalOut::is_connected()
-{
-    // Thread safe / atomic HAL call
-    return gpio_is_connected(&gpio);
-}
-
 DigitalOut &DigitalOut::operator= (int value)
 {
     // Underlying write is thread safe
@@ -64,12 +34,6 @@ DigitalOut &DigitalOut::operator= (DigitalOut &rhs)
     write(rhs.read());
     core_util_critical_section_exit();
     return *this;
-}
-
-DigitalOut::operator int()
-{
-    // Underlying call is thread safe
-    return read();
 }
 
 };

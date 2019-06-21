@@ -24,11 +24,6 @@
 
 namespace mbed {
 
-RawSerial::RawSerial(PinName tx, PinName rx, int baud) : SerialBase(tx, rx, baud)
-{
-    // No lock needed in the constructor
-}
-
 int RawSerial::getc()
 {
     lock();
@@ -87,20 +82,6 @@ int RawSerial::vprintf(const char *format, std::va_list arg)
     }
     unlock();
     return len;
-}
-
-/** Acquire exclusive access to this serial port
- */
-void RawSerial::lock()
-{
-    // No lock used - external synchronization required
-}
-
-/** Release exclusive access to this serial port
- */
-void RawSerial::unlock()
-{
-    // No lock used - external synchronization required
 }
 
 } // namespace mbed

@@ -55,14 +55,22 @@ public:
      *
      *  @param pin DigitalIn pin to connect to
      */
-    DigitalIn(PinName pin);
+    DigitalIn(PinName pin) : gpio()
+    {
+        // No lock needed in the constructor
+        gpio_init_in(&gpio, pin);
+    }
 
     /** Create a DigitalIn connected to the specified pin
      *
      *  @param pin DigitalIn pin to connect to
      *  @param mode the initial mode of the pin
      */
-    DigitalIn(PinName pin, PinMode mode);
+    DigitalIn(PinName pin, PinMode mode) : gpio()
+    {
+        // No lock needed in the constructor
+        gpio_init_in_ex(&gpio, pin, mode);
+    }
 
     /** Read the input, represented as 0 or 1 (int)
      *
@@ -70,7 +78,11 @@ public:
      *    An integer representing the state of the input pin,
      *    0 for logical 0, 1 for logical 1
      */
-    int read();
+    int read()
+    {
+        // Thread safe / atomic HAL call
+        return gpio_read(&gpio);
+    }
 
     /** Set the input pin mode
      *
@@ -84,7 +96,11 @@ public:
      *    Non zero value if pin is connected to uc GPIO
      *    0 if gpio object was initialized with NC
      */
-    int is_connected();
+    int is_connected()
+    {
+        // Thread safe / atomic HAL call
+        return gpio_is_connected(&gpio);
+    }
 
     /** An operator shorthand for read()
      * \sa DigitalIn::read()
@@ -94,7 +110,11 @@ public:
      *      led = button;   // Equivalent to led.write(button.read())
      * @endcode
      */
-    operator int();
+    operator int()
+    {
+        // Underlying read is thread safe
+        return read();
+    }
 
 protected:
 #if !defined(DOXYGEN_ONLY)

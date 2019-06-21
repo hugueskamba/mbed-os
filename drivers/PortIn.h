@@ -67,7 +67,10 @@ public:
      *  @returns
      *    An integer with each bit corresponding to the associated pin value
      */
-    int read();
+    int read()
+    {
+        return port_read(&_port);
+    }
 
     /** Set the input pin mode
      *
@@ -77,7 +80,10 @@ public:
 
     /** A shorthand for read()
      */
-    operator int();
+    operator int()
+    {
+        return read();
+    }
 
 private:
     port_t _port;

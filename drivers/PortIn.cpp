@@ -31,21 +31,11 @@ PortIn::PortIn(PortName port, int mask)
     core_util_critical_section_exit();
 }
 
-int PortIn::read()
-{
-    return port_read(&_port);
-}
-
 void PortIn::mode(PinMode mode)
 {
     core_util_critical_section_enter();
     port_mode(&_port, mode);
     core_util_critical_section_exit();
-}
-
-PortIn::operator int()
-{
-    return read();
 }
 
 };

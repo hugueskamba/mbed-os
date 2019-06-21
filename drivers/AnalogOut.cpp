@@ -21,11 +21,6 @@
 
 namespace mbed {
 
-AnalogOut::AnalogOut(PinName pin)
-{
-    analogout_init(&_dac, pin);
-}
-
 void AnalogOut::write(float value)
 {
     lock();
@@ -60,27 +55,6 @@ AnalogOut &AnalogOut::operator= (AnalogOut &rhs)
     // Underlying write call is thread safe
     write(rhs.read());
     return *this;
-}
-
-AnalogOut::operator float()
-{
-    // Underlying read call is thread safe
-    return read();
-}
-
-AnalogOut::~AnalogOut()
-{
-    // Do nothing
-}
-
-void AnalogOut::lock()
-{
-    _mutex.lock();
-}
-
-void AnalogOut::unlock()
-{
-    _mutex.unlock();
 }
 
 };

@@ -36,7 +36,11 @@ public:
      *
      *  @param pin DigitalInOut pin to connect to
      */
-    DigitalInOut(PinName pin);
+    DigitalInOut(PinName pin) : gpio()
+    {
+        // No lock needed in the constructor
+        gpio_init_in(&gpio, pin);
+    }
 
     /** Create a DigitalInOut connected to the specified pin
      *
@@ -45,16 +49,22 @@ public:
      *  @param mode the initial mode of the pin
      *  @param value the initial value of the pin if is an output
      */
-    DigitalInOut(
-        PinName pin, PinDirection direction, PinMode mode, int value
-    );
+    DigitalInOut(PinName pin, PinDirection direction, PinMode mode, int value) : gpio()
+    {
+        // No lock needed in the constructor
+        gpio_init_inout(&gpio, pin, direction, mode, value);
+    }
 
     /** Set the output, specified as 0 or 1 (int)
      *
      *  @param value An integer specifying the pin output value,
      *      0 for logical 0, 1 (or any other non-zero value) for logical 1
      */
-    void write(int value);
+    void write(int value)
+    {
+        // Thread safe / atomic HAL call
+        gpio_write(&gpio, value);
+    }
 
     /** Return the output setting, represented as 0 or 1 (int)
      *
@@ -62,7 +72,11 @@ public:
      *    an integer representing the output setting of the pin if it is an output,
      *    or read the input if set as an input
      */
-    int read();
+    int read()
+    {
+        // Thread safe / atomic HAL call
+        return gpio_read(&gpio);
+    }
 
     /** Set as an output
      */
@@ -84,7 +98,11 @@ public:
      *    Non zero value if pin is connected to uc GPIO
      *    0 if gpio object was initialized with NC
      */
-    int is_connected();
+    int is_connected()
+    {
+        // Thread safe / atomic HAL call
+        return gpio_is_connected(&gpio);
+    }
 
     /** A shorthand for write()
      * \sa DigitalInOut::write()
@@ -114,7 +132,11 @@ public:
      *      led = inout;   // Equivalent to led.write(inout.read())
      * @endcode
      */
-    operator int();
+    operator int()
+    {
+        // Underlying call is thread safe
+        return read();
+    }
 
 protected:
 #if !defined(DOXYGEN_ONLY)

@@ -86,14 +86,27 @@ public:
      * if(volume > 0.25) { ... }
      * @endcode
      */
-    operator float();
+    operator float()
+    {
+        // Underlying call is thread safe
+        return read();
+    }
 
-    virtual ~AnalogIn();
+    virtual ~AnalogIn()
+    {
+        // Do nothing
+    }
 
 protected:
 #if !defined(DOXYGEN_ONLY)
-    virtual void lock();
-    virtual void unlock();
+    virtual void lock()
+    {
+        _mutex->lock();
+    }
+    virtual void unlock()
+    {
+        _mutex->unlock();
+    }
 
     analogin_t _adc;
     static SingletonPtr<PlatformMutex> _mutex;

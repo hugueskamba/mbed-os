@@ -31,16 +31,6 @@ PortInOut::PortInOut(PortName port, int mask)
     core_util_critical_section_exit();
 }
 
-void PortInOut::write(int value)
-{
-    port_write(&_port, value);
-}
-
-int PortInOut::read()
-{
-    return port_read(&_port);
-}
-
 void PortInOut::output()
 {
     core_util_critical_section_enter();
@@ -75,11 +65,6 @@ PortInOut &PortInOut::operator= (PortInOut &rhs)
 {
     write(rhs.read());
     return *this;
-}
-
-PortInOut::operator int()
-{
-    return read();
 }
 
 };

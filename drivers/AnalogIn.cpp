@@ -46,27 +46,6 @@ unsigned short AnalogIn::read_u16()
     return ret;
 }
 
-AnalogIn::operator float()
-{
-    // Underlying call is thread safe
-    return read();
-}
-
-AnalogIn::~AnalogIn()
-{
-    // Do nothing
-}
-
-void AnalogIn::lock()
-{
-    _mutex->lock();
-}
-
-void AnalogIn::unlock()
-{
-    _mutex->unlock();
-}
-
 };
 
 #endif

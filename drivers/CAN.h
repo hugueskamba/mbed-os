@@ -49,10 +49,7 @@ public:
      *  @param _type    Type of Data: Use enum CANType for valid parameter values
      *  @param _format  Data Format: Use enum CANFormat for valid parameter values
      */
-    CANMessage(
-        unsigned int _id, const unsigned char *_data, unsigned char _len = 8,
-        CANType _type = CANData, CANFormat _format = CANStandard
-    );
+    CANMessage(unsigned int _id, const unsigned char *_data, unsigned char _len = 8, CANType _type = CANData, CANFormat _format = CANStandard);
 
 
     /** Creates CAN message with specific content.
@@ -63,10 +60,7 @@ public:
      *  @param _type    Type of Data: Use enum CANType for valid parameter values
      *  @param _format  Data Format: Use enum CANFormat for valid parameter values
      */
-    CANMessage(
-        unsigned int _id, const char *_data, unsigned char _len = 8,
-        CANType _type = CANData, CANFormat _format = CANStandard
-    );
+    CANMessage(unsigned int _id, const char *_data, unsigned char _len = 8, CANType _type = CANData, CANFormat _format = CANStandard);
 
     /** Creates CAN remote message.
      *
@@ -291,8 +285,15 @@ public:
 
 #if !defined(DOXYGEN_ONLY)
 protected:
-    virtual void lock();
-    virtual void unlock();
+    virtual void lock()
+    {
+        _mutex.lock();
+    }
+    virtual void unlock()
+    {
+        _mutex.unlock();
+    }
+
     can_t               _can;
     Callback<void()>    _irq[IrqCnt];
     PlatformMutex       _mutex;

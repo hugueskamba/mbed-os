@@ -58,7 +58,10 @@ public:
      *
      * @param pin AnalogOut pin to connect to
      */
-    AnalogOut(PinName pin);
+    AnalogOut(PinName pin)
+    {
+        analogout_init(&_dac, pin);
+    }
 
     /** Set the output voltage, specified as a percentage (float)
      *
@@ -101,14 +104,27 @@ public:
     /** An operator shorthand for read()
      * \sa AnalogOut::read()
      */
-    operator float();
+    operator float()
+    {
+        // Underlying read call is thread safe
+        return read();
+    }
 
-    virtual ~AnalogOut();
+    virtual ~AnalogOut()
+    {
+        // Do nothing
+    }
 
 protected:
 #if !defined(DOXYGEN_ONLY)
-    virtual void lock();
-    virtual void unlock();
+    virtual void lock()
+    {
+        _mutex.lock();
+    }
+    virtual void unlock()
+    {
+        _mutex.unlock();
+    }
 
     dac_t _dac;
     PlatformMutex _mutex;

@@ -45,14 +45,20 @@ public:
      *
      *  @param value An integer specifying a bit to write for every corresponding port pin
      */
-    void write(int value);
+    void write(int value)
+    {
+        port_write(&_port, value);
+    }
 
     /** Read the value currently output on the port
      *
      *  @returns
      *    An integer with each bit corresponding to associated port pin setting
      */
-    int read();
+    int read()
+    {
+        return port_read(&_port);
+    }
 
     /** Set as an output
      */
@@ -81,7 +87,10 @@ public:
     /** A shorthand for read()
      * \sa PortInOut::read()
      */
-    operator int();
+    operator int()
+    {
+        return read();
+    }
 
 private:
     port_t _port;

@@ -112,12 +112,6 @@ PwmOut &PwmOut::operator= (PwmOut &rhs)
     return *this;
 }
 
-PwmOut::operator float()
-{
-    // Underlying call is thread safe
-    return read();
-}
-
 void PwmOut::lock_deep_sleep()
 {
     if (_deep_sleep_locked == false) {

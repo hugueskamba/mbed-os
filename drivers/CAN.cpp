@@ -31,10 +31,7 @@ CANMessage::CANMessage() : CAN_Message()
     memset(data, 0, 8);
 }
 
-CANMessage::CANMessage(
-    unsigned int _id, const unsigned char *_data, unsigned char _len,
-    CANType _type, CANFormat _format
-)
+CANMessage::CANMessage(unsigned int _id, const unsigned char *_data, unsigned char _len, CANType _type, CANFormat _format)
 {
     len    = _len & 0xF;
     type   = _type;
@@ -43,10 +40,7 @@ CANMessage::CANMessage(
     memcpy(data, _data, _len);
 }
 
-CANMessage::CANMessage(
-    unsigned int _id, const char *_data, unsigned char _len,
-    CANType _type, CANFormat _format
-)
+CANMessage::CANMessage(unsigned int _id, const char *_data, unsigned char _len, CANType _type, CANFormat _format)
 {
     len    = _len & 0xF;
     type   = _type;
@@ -197,16 +191,6 @@ void CAN::_irq_handler(uint32_t id, CanIrqType type)
     if (handler->_irq[type]) {
         handler->_irq[type].call();
     }
-}
-
-void CAN::lock()
-{
-    _mutex.lock();
-}
-
-void CAN::unlock()
-{
-    _mutex.unlock();
 }
 
 } // namespace mbed

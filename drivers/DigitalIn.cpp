@@ -21,41 +21,11 @@
 
 namespace mbed {
 
-DigitalIn::DigitalIn(PinName pin) : gpio()
-{
-    // No lock needed in the constructor
-    gpio_init_in(&gpio, pin);
-}
-
-DigitalIn::DigitalIn(PinName pin, PinMode mode) : gpio()
-{
-    // No lock needed in the constructor
-    gpio_init_in_ex(&gpio, pin, mode);
-}
-
-int DigitalIn::read()
-{
-    // Thread safe / atomic HAL call
-    return gpio_read(&gpio);
-}
-
 void DigitalIn::mode(PinMode pull)
 {
     core_util_critical_section_enter();
     gpio_mode(&gpio, pull);
     core_util_critical_section_exit();
-}
-
-int DigitalIn::is_connected()
-{
-    // Thread safe / atomic HAL call
-    return gpio_is_connected(&gpio);
-}
-
-DigitalIn::operator int()
-{
-    // Underlying read is thread safe
-    return read();
 }
 
 };

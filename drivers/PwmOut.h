@@ -128,7 +128,11 @@ public:
     /** An operator shorthand for read()
      * \sa PwmOut::read()
      */
-    operator float();
+    operator float()
+    {
+        // Underlying call is thread safe
+        return read();
+    }
 
 #if !(DOXYGEN_ONLY)
 protected:
