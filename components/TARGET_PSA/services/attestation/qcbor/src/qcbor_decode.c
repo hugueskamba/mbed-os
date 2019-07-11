@@ -201,7 +201,9 @@ static const uint16_t spBuiltInTagMap[] = {
    CBOR_TAG_POS_BIGNUM, // See TAG_MAPPER_FIRST_FOUR
    CBOR_TAG_NEG_BIGNUM, // See TAG_MAPPER_FIRST_FOUR
    CBOR_TAG_FRACTION,
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
    CBOR_TAG_BIGFLOAT,
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
    CBOR_TAG_COSE_ENCRYPTO,
    CBOR_TAG_COSE_MAC0,
    CBOR_TAG_COSE_SIGN1,
@@ -471,6 +473,7 @@ inline static QCBORError DecodeInteger(int nMajorType, uint64_t uNumber, QCBORIt
 #error QCBOR_TYPE_BREAK macro value wrong
 #endif
 
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 #if QCBOR_TYPE_DOUBLE != DOUBLE_PREC_FLOAT
 #error QCBOR_TYPE_DOUBLE macro value wrong
 #endif
@@ -478,6 +481,7 @@ inline static QCBORError DecodeInteger(int nMajorType, uint64_t uNumber, QCBORIt
 #if QCBOR_TYPE_FLOAT != SINGLE_PREC_FLOAT
 #error QCBOR_TYPE_FLOAT macro value wrong
 #endif
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 /*
  Decode true, false, floats, break...
@@ -498,7 +502,7 @@ inline static QCBORError DecodeSimple(uint8_t uAdditionalInfo, uint64_t uNumber,
       case ADDINFO_RESERVED3:  // 30
          nReturn = QCBOR_ERR_UNSUPPORTED;
          break;
-
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
       case HALF_PREC_FLOAT:
          pDecodedItem->val.dfnum = IEEE754_HalfToDouble((uint16_t)uNumber);
          pDecodedItem->uDataType = QCBOR_TYPE_DOUBLE;
@@ -511,6 +515,7 @@ inline static QCBORError DecodeSimple(uint8_t uAdditionalInfo, uint64_t uNumber,
          pDecodedItem->val.dfnum = UsefulBufUtil_CopyUint64ToDouble(uNumber);
          pDecodedItem->uDataType = QCBOR_TYPE_DOUBLE;
          break;
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
       case CBOR_SIMPLEV_FALSE: // 20
       case CBOR_SIMPLEV_TRUE:  // 21
@@ -633,6 +638,7 @@ static int DecodeDateEpoch(QCBORItem *pDecodedItem)
          pDecodedItem->val.epochDate.nSeconds = pDecodedItem->val.uint64;
          break;
 
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
       case QCBOR_TYPE_DOUBLE:
          {
             const double d = pDecodedItem->val.dfnum;
@@ -644,6 +650,7 @@ static int DecodeDateEpoch(QCBORItem *pDecodedItem)
             pDecodedItem->val.epochDate.fSecondsFraction = d - pDecodedItem->val.epochDate.nSeconds;
          }
          break;
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
       default:
          nReturn = QCBOR_ERR_BAD_OPT_TAG;

@@ -1503,7 +1503,7 @@ static uint8_t spDateTestInput[] = {
 
 };
 
-
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 // have to check float expected only to within an epsilon
 int CHECK_EXPECTED_DOUBLE(double val, double expected) {
 
@@ -1513,6 +1513,7 @@ int CHECK_EXPECTED_DOUBLE(double val, double expected) {
 
    return diff > 0.0000001;
 }
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 
 int DateParseTest()
@@ -1561,6 +1562,7 @@ int DateParseTest()
       return -7;
    }
 
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
    // Epoch date in float format with fractional seconds
    if((nCBORError = QCBORDecode_GetNext(&DCtx, &Item)))
       return -8;
@@ -1569,6 +1571,7 @@ int DateParseTest()
       CHECK_EXPECTED_DOUBLE(Item.val.epochDate.fSecondsFraction, 0.1 )) {
       return -9;
    }
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
    // Epoch date float that is too large for our representation
    if(QCBORDecode_GetNext(&DCtx, &Item) != QCBOR_ERR_DATE_OVERFLOW) {
@@ -1688,7 +1691,9 @@ int OptTagParseTest()
    if(Item.uDataType != QCBOR_TYPE_ARRAY ||
       !QCBORDecode_IsTagged(&DCtx, &Item, 0x9192939495969798) ||
       QCBORDecode_IsTagged(&DCtx, &Item, 257) ||
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
       QCBORDecode_IsTagged(&DCtx, &Item, CBOR_TAG_BIGFLOAT) ||
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
       Item.val.uCount != 0) {
       return -9;
    }
