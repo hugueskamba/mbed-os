@@ -8,6 +8,11 @@
 #include "utest/unity_handler.h"
 #include <stddef.h>
 
+#ifndef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
+#define UNITY_EXCLUDE_DOUBLE
+#define UNITY_EXCLUDE_FLOAT
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
+
 /* If omitted from header, declare overrideable prototypes here so they're ready for use */
 #ifdef UNITY_OMIT_OUTPUT_CHAR_HEADER_DECLARATION
 int UNITY_OUTPUT_CHAR(int);
