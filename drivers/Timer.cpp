@@ -75,10 +75,17 @@ int Timer::read_us()
     return read_high_resolution_us();
 }
 
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 float Timer::read()
 {
     return (float)read_high_resolution_us() / 1000000.0f;
 }
+#else
+int Timer::read()
+{
+    return (int)read_high_resolution_us() / 1000000;
+}
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 int Timer::read_ms()
 {
@@ -112,9 +119,17 @@ void Timer::reset()
     core_util_critical_section_exit();
 }
 
+
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 Timer::operator float()
 {
     return read();
 }
+#else
+Timer::operator int()
+{
+    return read();
+}
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 } // namespace mbed

@@ -74,7 +74,11 @@ public:
      *
      *  @returns    Time passed in seconds
      */
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
     float read();
+#else
+    int read();
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
     /** Get the time passed in milliseconds
      *
@@ -90,7 +94,11 @@ public:
 
     /** An operator shorthand for read()
      */
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
     operator float();
+#else
+    operator int();
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
     /** Get in a high resolution type the time passed in microseconds.
      *  Returns a 64 bit integer.
