@@ -627,6 +627,7 @@ protected:
     uint8_t verify_link_ADR_req(verify_adr_params_t *verify_params, int8_t *dr,
                                 int8_t *tx_pow, uint8_t *nb_rep);
 
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
     /**
      * Computes the RX window timeout and the RX window offset.
      */
@@ -635,11 +636,22 @@ protected:
                               uint32_t *window_length, uint32_t *window_length_ms,
                               int32_t *window_offset,
                               uint8_t phy_dr);
+#else
+    void get_rx_window_params(int t_symbol, uint8_t min_rx_symbols,
+                              int rx_error, int wakeup_time,
+                              uint32_t *window_length, uint32_t *window_length_ms,
+                              int32_t *window_offset,
+                              uint8_t phy_dr);                              
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
     /**
      * Computes the txPower, based on the max EIRP and the antenna gain.
      */
     int8_t compute_tx_power(int8_t txPowerIndex, float maxEirp, float antennaGain);
+#else
+    int8_t compute_tx_power(int8_t txPowerIndex, int maxEirp, int antennaGain);
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
     /**
      * Provides a random number in the range provided.
@@ -667,12 +679,12 @@ private:
     /**
      * Computes the symbol time for LoRa modulation.
      */
-    float compute_symb_timeout_lora(uint8_t phy_dr, uint32_t bandwidth);
+    int compute_symb_timeout_lora(uint8_t phy_dr, uint32_t bandwidth);
 
     /**
      * Computes the symbol time for FSK modulation.
      */
-    float compute_symb_timeout_fsk(uint8_t phy_dr);
+    int compute_symb_timeout_fsk(uint8_t phy_dr);
 
 protected:
     LoRaRadio *_radio;

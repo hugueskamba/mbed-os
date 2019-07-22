@@ -392,18 +392,18 @@ uint8_t LoRaPHY::verify_link_ADR_req(verify_adr_params_t *verify_params,
     return status;
 }
 
-float LoRaPHY::compute_symb_timeout_lora(uint8_t phy_dr, uint32_t bandwidth)
+int LoRaPHY::compute_symb_timeout_lora(uint8_t phy_dr, uint32_t bandwidth)
 {
     // in milliseconds
-    return ((float)(1 << phy_dr) / (float) bandwidth * 1000);
+    return ((int)(1 << phy_dr) / (int) bandwidth * 1000);
 }
 
-float LoRaPHY::compute_symb_timeout_fsk(uint8_t phy_dr)
+int LoRaPHY::compute_symb_timeout_fsk(uint8_t phy_dr)
 {
-    return (8.0f / (float) phy_dr); // 1 symbol equals 1 byte
+    return (8 / (int) phy_dr); // 1 symbol equals 1 byte
 }
 
-
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 void LoRaPHY::get_rx_window_params(float t_symb, uint8_t min_rx_symb,
                                    float error_fudge, float wakeup_time,
                                    uint32_t *window_length, uint32_t *window_length_ms,
@@ -445,7 +445,51 @@ void LoRaPHY::get_rx_window_params(float t_symb, uint8_t min_rx_symb,
     *window_length = (uint32_t) ceil(window_len_in_ms / t_symb);
     *window_length_ms = window_len_in_ms;
 }
+#else
+void LoRaPHY::get_rx_window_params(int t_symb, uint8_t min_rx_symb,
+                                   int error_fudge, int wakeup_time,
+                                   uint32_t *window_length, uint32_t *window_length_ms,
+                                   int32_t *window_offset,
+                                   uint8_t phy_dr)
+{
+    int target_rx_window_offset;
+    int window_len_in_ms;
 
+    if (phy_params.fsk_supported && phy_dr == phy_params.max_rx_datarate) {
+        min_rx_symb = MAX_PREAMBLE_LENGTH;
+    }
+
+    // We wish to be as close as possible to the actual start of data, i.e.,
+    // we are interested in the preamble symbols which are at the tail of the
+    // preamble sequence.
+    target_rx_window_offset = (MAX_PREAMBLE_LENGTH - min_rx_symb) * t_symb; //in ms
+
+    // Actual window offset in ms in response to timing error fudge factor and
+    // radio wakeup/turned around time.
+    *window_offset = floor(target_rx_window_offset - error_fudge - wakeup_time);
+
+    // possible wait for next symbol start if we start inside the preamble
+    int possible_wait_for_symb_start = MIN(t_symb,
+                                             ((2 * error_fudge) + wakeup_time + TICK_GRANULARITY_JITTER));
+
+    // how early we might start reception relative to transmit start (so negative if before transmit starts)
+    int earliest_possible_start_time = *window_offset - error_fudge - TICK_GRANULARITY_JITTER;
+
+    // time in (ms) we may have to wait for the other side to start transmission
+    int possible_wait_for_transmit = -earliest_possible_start_time;
+
+    // Minimum reception time plus extra time (in ms) we may have turned on before the
+    // other side started transmission
+    window_len_in_ms = (min_rx_symb * t_symb) + MAX(possible_wait_for_transmit, possible_wait_for_symb_start);
+
+    // Setting the window_length in terms of 'symbols' for LoRa modulation or
+    // in terms of 'bytes' for FSK
+    *window_length = (uint32_t) ceil(window_len_in_ms / t_symb);
+    *window_length_ms = window_len_in_ms;
+}
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
+
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 int8_t LoRaPHY::compute_tx_power(int8_t tx_power_idx, float max_eirp,
                                  float antenna_gain)
 {
@@ -455,7 +499,17 @@ int8_t LoRaPHY::compute_tx_power(int8_t tx_power_idx, float max_eirp,
 
     return phy_tx_power;
 }
+#else
+int8_t LoRaPHY::compute_tx_power(int8_t tx_power_idx, int max_eirp,
+                                 int antenna_gain)
+{
+    int8_t phy_tx_power = 0;
 
+    phy_tx_power = (int8_t) floor((max_eirp - (tx_power_idx * 2U)) - antenna_gain);
+
+    return phy_tx_power;
+}
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 int8_t LoRaPHY::get_next_lower_dr(int8_t dr, int8_t min_dr)
 {
@@ -829,7 +883,7 @@ void LoRaPHY::compute_rx_win_params(int8_t datarate, uint8_t min_rx_symbols,
                                     uint32_t rx_error,
                                     rx_config_params_t *rx_conf_params)
 {
-    float t_symbol = 0.0;
+    int t_symbol = 0;
 
     // Get the datarate, perform a boundary check
     rx_conf_params->datarate = MIN(datarate, phy_params.max_rx_datarate);
@@ -849,7 +903,7 @@ void LoRaPHY::compute_rx_win_params(int8_t datarate, uint8_t min_rx_symbols,
         rx_conf_params->frequency = phy_params.channels.channel_list[rx_conf_params->channel].frequency;
     }
 
-    get_rx_window_params(t_symbol, min_rx_symbols, (float) rx_error, MBED_CONF_LORA_WAKEUP_TIME,
+    get_rx_window_params(t_symbol, min_rx_symbols, (int) rx_error, MBED_CONF_LORA_WAKEUP_TIME,
                          &rx_conf_params->window_timeout, &rx_conf_params->window_timeout_ms,
                          &rx_conf_params->window_offset,
                          rx_conf_params->datarate);
