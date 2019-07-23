@@ -323,6 +323,7 @@ static void fhss_event_timer_cb(int8_t timer_id, uint16_t slots)
     }
 }
 
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 static uint32_t fhss_ws_calculate_ufsi(fhss_structure_t *fhss_structure, uint32_t tx_time)
 {
     uint8_t dwell_time = fhss_structure->ws->fhss_configuration.fhss_uc_dwell_interval;
@@ -345,6 +346,7 @@ static uint32_t fhss_ws_calculate_ufsi(fhss_structure_t *fhss_structure, uint32_
     }
     return own_floor((float)(ms_since_seq_start * DEF_2E24) / (seq_length * dwell_time));
 }
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 static uint32_t fhss_ws_calculate_broadcast_interval_offset(fhss_structure_t *fhss_structure, uint32_t tx_time)
 {
@@ -362,6 +364,7 @@ static uint32_t fhss_ws_calculate_broadcast_interval_offset(fhss_structure_t *fh
     return (broadcast_interval - remaining_time_ms) + time_to_tx;
 }
 
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 static uint16_t fhss_ws_calculate_destination_slot(fhss_ws_neighbor_timing_info_t *neighbor_timing_info, uint32_t tx_time)
 {
     uint_fast24_t ufsi = neighbor_timing_info->uc_timing_info.ufsi;
@@ -374,6 +377,7 @@ static uint16_t fhss_ws_calculate_destination_slot(fhss_ws_neighbor_timing_info_
     uint32_t dest_ms_since_seq_start = own_ceil((float)((uint64_t)ufsi * seq_length * dwell_time) / DEF_2E24);
     return (own_floor(((float)(US_TO_MS(tx_time - ufsi_timestamp) + dest_ms_since_seq_start) / dwell_time)) % seq_length);
 }
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 static uint32_t fhss_ws_get_sf_timeout_callback(fhss_structure_t *fhss_structure)
 {
