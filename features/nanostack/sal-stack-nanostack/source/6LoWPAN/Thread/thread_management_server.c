@@ -721,6 +721,7 @@ static void energy_scan_confirm_cb(int8_t if_id, const mlme_scan_conf_t *conf)
     }
 }
 
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 void thread_energy_scan_timeout_cb(void *arg)
 {
     link_configuration_s *linkConfiguration;
@@ -775,6 +776,7 @@ void thread_energy_scan_timeout_cb(void *arg)
         s->mac_api->mlme_req(s->mac_api, MLME_SCAN, &req);
     }
 }
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 
 static void thread_panid_scan_timeout_cb(void *arg)
