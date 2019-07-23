@@ -66,7 +66,9 @@ static void thread_parse_accept(protocol_interface_info_entry_t *cur, mle_messag
 static void thread_parse_annoucement(protocol_interface_info_entry_t *cur, mle_message_t *mle_msg);
 static void thread_parse_data_response(protocol_interface_info_entry_t *cur, mle_message_t *mle_msg, uint8_t linkMargin);
 static void thread_host_child_update_request_process(protocol_interface_info_entry_t *cur, mle_message_t *mle_msg, uint8_t linkMargin);
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 static void thread_parse_child_update_response(protocol_interface_info_entry_t *cur, mle_message_t *mle_msg, mle_security_header_t *security_headers, uint8_t linkMargin);
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 /* Public functions */
 void thread_general_mle_receive_cb(int8_t interface_id, mle_message_t *mle_msg, mle_security_header_t *security_headers)
@@ -824,6 +826,7 @@ static void thread_host_child_update_request_process(protocol_interface_info_ent
     }
 }
 
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 static void thread_parse_child_update_response(protocol_interface_info_entry_t *cur, mle_message_t *mle_msg, mle_security_header_t *security_headers, uint8_t linkMargin)
 {
     uint8_t mode;
@@ -907,5 +910,6 @@ static void thread_parse_child_update_response(protocol_interface_info_entry_t *
     mac_data_poll_protocol_poll_mode_decrement(cur);
 
 }
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 #endif
