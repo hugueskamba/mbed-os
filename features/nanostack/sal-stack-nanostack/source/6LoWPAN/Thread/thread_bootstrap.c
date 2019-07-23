@@ -923,6 +923,7 @@ void thread_interface_init(protocol_interface_info_entry_t *cur)
 
 }
 
+#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 static void thread_interface_bootsrap_mode_init(protocol_interface_info_entry_t *cur)
 {
     thread_routing_reset(&cur->thread_info->routing);
@@ -973,6 +974,7 @@ static void thread_interface_bootsrap_mode_init(protocol_interface_info_entry_t 
 
     cur->thread_info->thread_attached_state = THREAD_STATE_NETWORK_DISCOVER;
 }
+#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 int8_t thread_bootsrap_event_trig(thread_bootsrap_event_type_e event_type, int8_t Id, arm_library_event_priority_e priority)
 {
