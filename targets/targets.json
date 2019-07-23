@@ -51,6 +51,10 @@
             "init-us-ticker-at-boot": {
                 "help": "Initialize the microsecond ticker at boot rather than on first use, and leave it initialized. This speeds up wait_us in particular.",
                 "value": false
+            },
+            "enable-floating-point": {
+                "help": "Enable floating point usage within Mbed-OS. Possible values are true or null",
+                "value": true
             }
         }
     },
