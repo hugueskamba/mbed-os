@@ -1691,9 +1691,7 @@ int OptTagParseTest()
    if(Item.uDataType != QCBOR_TYPE_ARRAY ||
       !QCBORDecode_IsTagged(&DCtx, &Item, 0x9192939495969798) ||
       QCBORDecode_IsTagged(&DCtx, &Item, 257) ||
-#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
       QCBORDecode_IsTagged(&DCtx, &Item, CBOR_TAG_BIGFLOAT) ||
-#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
       Item.val.uCount != 0) {
       return -9;
    }
