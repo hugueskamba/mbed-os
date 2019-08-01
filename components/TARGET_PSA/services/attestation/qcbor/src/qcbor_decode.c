@@ -201,9 +201,7 @@ static const uint16_t spBuiltInTagMap[] = {
    CBOR_TAG_POS_BIGNUM, // See TAG_MAPPER_FIRST_FOUR
    CBOR_TAG_NEG_BIGNUM, // See TAG_MAPPER_FIRST_FOUR
    CBOR_TAG_FRACTION,
-#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
    CBOR_TAG_BIGFLOAT,
-#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
    CBOR_TAG_COSE_ENCRYPTO,
    CBOR_TAG_COSE_MAC0,
    CBOR_TAG_COSE_SIGN1,
@@ -473,7 +471,6 @@ inline static QCBORError DecodeInteger(int nMajorType, uint64_t uNumber, QCBORIt
 #error QCBOR_TYPE_BREAK macro value wrong
 #endif
 
-#ifdef MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 #if QCBOR_TYPE_DOUBLE != DOUBLE_PREC_FLOAT
 #error QCBOR_TYPE_DOUBLE macro value wrong
 #endif
@@ -481,7 +478,6 @@ inline static QCBORError DecodeInteger(int nMajorType, uint64_t uNumber, QCBORIt
 #if QCBOR_TYPE_FLOAT != SINGLE_PREC_FLOAT
 #error QCBOR_TYPE_FLOAT macro value wrong
 #endif
-#endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
 /*
  Decode true, false, floats, break...
@@ -514,6 +510,12 @@ inline static QCBORError DecodeSimple(uint8_t uAdditionalInfo, uint64_t uNumber,
       case DOUBLE_PREC_FLOAT:
          pDecodedItem->val.dfnum = UsefulBufUtil_CopyUint64ToDouble(uNumber);
          pDecodedItem->uDataType = QCBOR_TYPE_DOUBLE;
+         break;
+#else
+      case HALF_PREC_FLOAT:
+      case SINGLE_PREC_FLOAT:
+      case DOUBLE_PREC_FLOAT:
+         nReturn = QCBOR_ERR_UNSUPPORTED;
          break;
 #endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
@@ -649,6 +651,11 @@ static int DecodeDateEpoch(QCBORItem *pDecodedItem)
             pDecodedItem->val.epochDate.nSeconds = d; // Float to integer conversion happening here.
             pDecodedItem->val.epochDate.fSecondsFraction = d - pDecodedItem->val.epochDate.nSeconds;
          }
+         break;
+#else
+      case QCBOR_TYPE_DOUBLE:
+         nReturn = QCBOR_ERR_BAD_OPT_TAG;
+         goto Done;
          break;
 #endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
