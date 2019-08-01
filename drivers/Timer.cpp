@@ -83,7 +83,7 @@ float Timer::read()
 #else
 int Timer::read()
 {
-    return (int)read_high_resolution_us() / 1000000;
+    return read_high_resolution_us() / 1000000;
 }
 #endif // MBED_CONF_TARGET_ENABLE_FLOATING_POINT
 
