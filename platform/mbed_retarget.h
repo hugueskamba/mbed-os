@@ -586,6 +586,10 @@ extern "C" {
     long telldir(DIR *);
     void seekdir(DIR *, long);
     int mkdir(const char *name, mode_t n);
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+    ssize_t minimal_console_write(const void *buffer, size_t length);
+    ssize_t minimal_console_read(void *buffer, size_t length);
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 #if __cplusplus
 }; // extern "C"
 
