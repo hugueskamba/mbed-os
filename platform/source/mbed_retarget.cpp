@@ -215,14 +215,29 @@ short DirectSerial::poll(short events) const
     return revents;
 }
 #else
+/** Class providing minimal UART communication functionalities
+ */
 class MinimalSerial {
 public:
     MinimalSerial(PinName tx, PinName rx, int baud);
-    virtual ssize_t write(const void *buffer, size_t size);
-    virtual ssize_t read(void *buffer, size_t size);
+    virtual int putc(int c);
+    virtual int getc();
 };
 
-MinimalSerial::MinimalSerial(PinName tx, PinName rx, int baud)
+/** Create a MinimalSerial port, connected to the specified transmit and receive pins, with the specified baud.
+ *
+ *  @param tx Transmit pin
+ *  @param rx Receive pin
+ *  @param baud The baud rate of the serial port (optional, defaults to MBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE)
+ *
+ *  @note
+ *    Either tx or rx may be specified as NC if unused
+ */
+MinimalSerial::MinimalSerial(
+    PinName tx,
+    PinName rx,
+    int baud = MBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE
+)
 {
     if (stdio_uart_inited) {
         return;
@@ -239,24 +254,27 @@ MinimalSerial::MinimalSerial(PinName tx, PinName rx, int baud)
 #endif
 }
 
-ssize_t MinimalSerial::write(const void *buffer, size_t size)
+/** Write a char to the serial port
+ *
+ * @param c The char to write
+ *
+ * @returns The written char
+ */
+int MinimalSerial::putc(int c)
 {
-    const unsigned char *buf = static_cast<const unsigned char *>(buffer);
-    for (size_t i = 0; i < size; i++) {
-        serial_putc(&stdio_uart, buf[i]);
-    }
-    return size;
+    serial_putc(&stdio_uart, c);
+    return c;
 }
 
-ssize_t MinimalSerial::read(void *buffer, size_t size)
+/** Read a char to the serial port
+ *
+ * @returns The char read from the serial port
+ */
+int MinimalSerial::getc()
 {
-    unsigned char *buf = static_cast<unsigned char *>(buffer);
-    if (size == 0) {
-        return 0;
-    }
-    buf[0] = serial_getc(&stdio_uart);
-    return 1;
+   return serial_getc(&stdio_uart);
 }
+
 
 /* Locate the default console */
 static MinimalSerial *get_minimal_console()
@@ -793,7 +811,13 @@ MBED_WEAK ssize_t minimal_console_write(const void *buffer, size_t length)
         return -1;
     }
 
-    return mc->write(buffer, length);
+    const unsigned char *buf = static_cast<const unsigned char *>(buffer);
+
+    for (size_t i = 0; i < length; i++) {
+        mc->putc(buf[i]);
+    }
+
+    return length;
 }
 #endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 
@@ -906,13 +930,19 @@ extern "C" ssize_t read(int fildes, void *buf, size_t length)
 /* Read the serial interface and store the content to a buffer */
 MBED_WEAK ssize_t minimal_console_read(void *buffer, size_t length)
 {
+    if (length == 0) {
+        return 0;
+    }
+
     MinimalSerial *mc = get_minimal_console();
     if (mc == nullptr) {
         errno = EBADF;
         return -1;
     }
 
-    return mc->read(buffer, length);
+    unsigned char *buf = static_cast<unsigned char *>(buffer);
+    buf[0] = mc->getc();
+    return 1;
 }
 #endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 
