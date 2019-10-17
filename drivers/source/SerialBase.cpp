@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2006-2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,13 +24,13 @@
 namespace mbed {
 
 SerialBase::SerialBase(PinName tx, PinName rx, int baud) :
+    MinimalSerial(tx, rx, baud),
 #if DEVICE_SERIAL_ASYNCH
     _thunk_irq(this), _tx_usage(DMA_USAGE_NEVER),
     _rx_usage(DMA_USAGE_NEVER), _tx_callback(NULL),
     _rx_callback(NULL), _tx_asynch_set(false),
-    _rx_asynch_set(false),
+    _rx_asynch_set(false)
 #endif
-    _serial(), _baud(baud)
 {
     // No lock needed in the constructor
 
@@ -38,17 +38,7 @@ SerialBase::SerialBase(PinName tx, PinName rx, int baud) :
         _irq[i] = NULL;
     }
 
-    serial_init(&_serial, tx, rx);
-    serial_baud(&_serial, _baud);
     serial_irq_handler(&_serial, SerialBase::_irq_handler, (uint32_t)this);
-}
-
-void SerialBase::baud(int baudrate)
-{
-    lock();
-    serial_baud(&_serial, baudrate);
-    _baud = baudrate;
-    unlock();
 }
 
 void SerialBase::format(int bits, Parity parity, int stop_bits)
@@ -107,19 +97,6 @@ void SerialBase::_irq_handler(uint32_t id, SerialIrq irq_type)
     }
 }
 
-int SerialBase::_base_getc()
-{
-    // Mutex is already held
-    return serial_getc(&_serial);
-}
-
-int SerialBase::_base_putc(int c)
-{
-    // Mutex is already held
-    serial_putc(&_serial, c);
-    return c;
-}
-
 void SerialBase::set_break()
 {
     lock();
@@ -151,15 +128,6 @@ void SerialBase::send_break()
     unlock();
 }
 
-void SerialBase::lock()
-{
-    // Stub
-}
-
-void SerialBase:: unlock()
-{
-    // Stub
-}
 
 SerialBase::~SerialBase()
 {
@@ -171,31 +139,6 @@ SerialBase::~SerialBase()
     }
 }
 
-#if DEVICE_SERIAL_FC
-void SerialBase::set_flow_control(Flow type, PinName flow1, PinName flow2)
-{
-    lock();
-    FlowControl flow_type = (FlowControl)type;
-    switch (type) {
-        case RTS:
-            serial_set_flow_control(&_serial, flow_type, flow1, NC);
-            break;
-
-        case CTS:
-            serial_set_flow_control(&_serial, flow_type, NC, flow1);
-            break;
-
-        case RTSCTS:
-        case Disabled:
-            serial_set_flow_control(&_serial, flow_type, flow1, flow2);
-            break;
-
-        default:
-            break;
-    }
-    unlock();
-}
-#endif
 
 #if DEVICE_SERIAL_ASYNCH
 

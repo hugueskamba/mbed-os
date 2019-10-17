@@ -16,6 +16,11 @@
             "value": false
         },
 
+        "stdio-minimal-console-only": {
+            "help": "(Applies if target.console-uart is true.) Enable this instead of `stdio-buffered-serial` if filehandles are not required to access the serial interface as console only to print.",
+            "value": true
+        },
+
         "stdio-baud-rate": {
             "help": "(Applies if target.console-uart is true.) Baud rate for stdio",
             "value": 9600

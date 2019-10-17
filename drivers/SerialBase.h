@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2006-2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@
 #include "hal/serial_api.h"
 #include "platform/mbed_toolchain.h"
 #include "platform/NonCopyable.h"
+#include "drivers/MinimalSerial.h"
 
 #if DEVICE_SERIAL_ASYNCH
 #include "platform/CThunk.h"
@@ -43,15 +44,9 @@ namespace mbed {
  *
  * @note Synchronization level: Set by subclass
  */
-class SerialBase : private NonCopyable<SerialBase> {
+class SerialBase : public MinimalSerial, private NonCopyable<SerialBase> {
 
 public:
-    /** Set the baud rate of the serial port
-     *
-     *  @param baudrate The baudrate of the serial port (default = 9600).
-     */
-    void baud(int baudrate);
-
     enum Parity {
         None = 0,
         Odd,
@@ -65,13 +60,6 @@ public:
         TxIrq,
 
         IrqCnt
-    };
-
-    enum Flow {
-        Disabled = 0,
-        RTS,
-        CTS,
-        RTSCTS
     };
 
     /** Set the transmission format used by the serial port
@@ -155,28 +143,7 @@ public:
      */
     void send_break();
 
-#if !defined(DOXYGEN_ONLY)
-protected:
-
-    /** Acquire exclusive access to this serial port
-     */
-    virtual void lock(void);
-
-    /** Release exclusive access to this serial port
-     */
-    virtual void unlock(void);
-#endif
 public:
-
-#if DEVICE_SERIAL_FC
-    /** Set the flow control type on the serial port
-     *
-     *  @param type the flow control type (Disabled, RTS, CTS, RTSCTS)
-     *  @param flow1 the first flow control pin (RTS for RTS or RTSCTS, CTS for CTS)
-     *  @param flow2 the second flow control pin (CTS for RTSCTS)
-     */
-    void set_flow_control(Flow type, PinName flow1 = NC, PinName flow2 = NC);
-#endif
 
     static void _irq_handler(uint32_t id, SerialIrq irq_type);
 
@@ -291,10 +258,6 @@ protected:
     SerialBase(PinName tx, PinName rx, int baud);
     virtual ~SerialBase();
 
-    int _base_getc();
-
-    int _base_putc(int c);
-
 #if DEVICE_SERIAL_ASYNCH
     CThunk<SerialBase> _thunk_irq;
     DMAUsage _tx_usage;
@@ -304,10 +267,7 @@ protected:
     bool _tx_asynch_set;
     bool _rx_asynch_set;
 #endif
-
-    serial_t         _serial;
     Callback<void()> _irq[IrqCnt];
-    int              _baud;
 #endif
 };
 
