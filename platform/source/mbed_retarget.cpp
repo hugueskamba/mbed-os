@@ -31,6 +31,7 @@
 #include "platform/mbed_critical.h"
 #include "platform/mbed_poll.h"
 #include "drivers/UARTSerial.h"
+#include "drivers/UnbufferedSerial.h"
 #include "hal/us_ticker_api.h"
 #include "hal/lp_ticker_api.h"
 #include <stdlib.h>
@@ -142,87 +143,11 @@ void remove_filehandle(FileHandle *file)
 }
 }
 
-#if DEVICE_SERIAL
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+#if MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
 extern int stdio_uart_inited;
 extern serial_t stdio_uart;
 
-/* Private FileHandle to implement backwards-compatible functionality of
- * direct HAL serial access for default stdin/stdout/stderr.
- * This is not a particularly well-behaved FileHandle for a stream, which
- * is why it's not public. People should be using UARTSerial.
- */
-class DirectSerial : public FileHandle {
-public:
-    DirectSerial(PinName tx, PinName rx, int baud);
-    virtual ssize_t write(const void *buffer, size_t size);
-    virtual ssize_t read(void *buffer, size_t size);
-    virtual off_t seek(off_t offset, int whence = SEEK_SET)
-    {
-        return -ESPIPE;
-    }
-    virtual off_t size()
-    {
-        return -EINVAL;
-    }
-    virtual int isatty()
-    {
-        return true;
-    }
-    virtual int close()
-    {
-        return 0;
-    }
-    virtual short poll(short events) const;
-};
-
-DirectSerial::DirectSerial(PinName tx, PinName rx, int baud)
-{
-    if (stdio_uart_inited) {
-        return;
-    }
-    serial_init(&stdio_uart, tx, rx);
-    serial_baud(&stdio_uart, baud);
-#if   CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTS
-    serial_set_flow_control(&stdio_uart, FlowControlRTS, STDIO_UART_RTS, NC);
-#elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_CTS
-    serial_set_flow_control(&stdio_uart, FlowControlCTS, NC, STDIO_UART_CTS);
-#elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTSCTS
-    serial_set_flow_control(&stdio_uart, FlowControlRTSCTS, STDIO_UART_RTS, STDIO_UART_CTS);
-#endif
-}
-
-ssize_t DirectSerial::write(const void *buffer, size_t size)
-{
-    const unsigned char *buf = static_cast<const unsigned char *>(buffer);
-    for (size_t i = 0; i < size; i++) {
-        serial_putc(&stdio_uart, buf[i]);
-    }
-    return size;
-}
-
-ssize_t DirectSerial::read(void *buffer, size_t size)
-{
-    unsigned char *buf = static_cast<unsigned char *>(buffer);
-    if (size == 0) {
-        return 0;
-    }
-    buf[0] = serial_getc(&stdio_uart);
-    return 1;
-}
-
-short DirectSerial::poll(short events) const
-{
-    short revents = 0;
-    if ((events & POLLIN) && serial_readable(&stdio_uart)) {
-        revents |= POLLIN;
-    }
-    if ((events & POLLOUT) && serial_writable(&stdio_uart)) {
-        revents |= POLLOUT;
-    }
-    return revents;
-}
-#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
-#   if MBED_CONF_TARGET_CONSOLE_UART
 
 static void do_serial_init()
 {
@@ -247,10 +172,8 @@ static void do_serial_init_once()
     mstd::call_once(once, do_serial_init);
 }
 
-#endif // MBED_CONF_TARGET_CONSOLE_UART
+#endif // MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
 #endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
-
-#endif // DEVICE_SERIAL
 
 class Sink : public FileHandle {
 public:
@@ -300,21 +223,28 @@ MBED_WEAK FileHandle *mbed::mbed_override_console(int fd)
     return NULL;
 }
 
+#if MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
+static void set_console_flow_control(SerialBase *console)
+{
+#if   CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTS
+    console->set_flow_control(SerialBase::RTS, STDIO_UART_RTS, NC);
+#elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_CTS
+    console->set_flow_control(SerialBase::CTS, NC, STDIO_UART_CTS);
+#elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTSCTS
+    console->set_flow_control(SerialBase::RTSCTS, STDIO_UART_RTS, STDIO_UART_CTS);
+#endif
+}
+#endif // MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
+
 static FileHandle *default_console()
 {
 #if MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
 #  if MBED_CONF_PLATFORM_STDIO_BUFFERED_SERIAL
     static UARTSerial console(STDIO_UART_TX, STDIO_UART_RX, MBED_CONF_PLATFORM_STDIO_BAUD_RATE);
-#   if   CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTS
-    console.set_flow_control(SerialBase::RTS, STDIO_UART_RTS, NC);
-#   elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_CTS
-    console.set_flow_control(SerialBase::CTS, NC, STDIO_UART_CTS);
-#   elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTSCTS
-    console.set_flow_control(SerialBase::RTSCTS, STDIO_UART_RTS, STDIO_UART_CTS);
-#   endif
 #  else
-    static DirectSerial console(STDIO_UART_TX, STDIO_UART_RX, MBED_CONF_PLATFORM_STDIO_BAUD_RATE);
+    static UnbufferedSerial console(STDIO_UART_TX, STDIO_UART_RX, MBED_CONF_PLATFORM_STDIO_BAUD_RATE);
 #  endif
+    set_console_flow_control(&console);
 #else // MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
     static Sink console;
 #endif
