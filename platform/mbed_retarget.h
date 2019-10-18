@@ -94,6 +94,7 @@ namespace mbed {
 class FileHandle;
 class DirHandle;
 
+#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 /** Targets may implement this to change stdin, stdout, stderr.
  *
  * If the application hasn't provided mbed_override_console, this is called
@@ -179,6 +180,7 @@ FileHandle *mbed_override_console(int fd);
  *           possible if it's not open with current implementation).
  */
 FileHandle *mbed_file_handle(int fd);
+#endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 }
 
 typedef mbed::DirHandle DIR;
@@ -559,6 +561,7 @@ struct pollfd {
 #if __cplusplus
 extern "C" {
 #endif
+#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
     int open(const char *path, int oflag, ...);
 #ifndef __IAR_SYSTEMS_ICC__ /* IAR provides fdopen itself */
 #if __cplusplus
@@ -567,8 +570,10 @@ extern "C" {
     FILE *fdopen(int fildes, const char *mode);
 #endif
 #endif
+#endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
     ssize_t write(int fildes, const void *buf, size_t nbyte);
     ssize_t read(int fildes, void *buf, size_t nbyte);
+#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
     off_t lseek(int fildes, off_t offset, int whence);
     int ftruncate(int fildes, off_t length);
     int isatty(int fildes);
@@ -586,6 +591,7 @@ extern "C" {
     long telldir(DIR *);
     void seekdir(DIR *, long);
     int mkdir(const char *name, mode_t n);
+#endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 #if __cplusplus
 }; // extern "C"
 
@@ -618,6 +624,34 @@ std::FILE *fdopen(mbed::FileHandle *fh, const char *mode);
  *  @return         an integer file descriptor, or negative if no descriptors available
  */
 int bind_to_fd(mbed::FileHandle *fh);
+
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+/** Targets may implement this to override how to write to the console.
+ *
+ * If the target hasn't provided minimal_console_write, this is called
+ * to give the target a chance to specify a serial access to the console.
+ *
+ * If this is not provided, the console will be MinimalConsole
+ *
+ *  @param buffer   The buffer to write from
+ *  @param length   The number of bytes to write
+ *  @return         The number of bytes written
+ */
+ssize_t minimal_console_write(const void *buffer, size_t length);
+
+/** Targets may implement this to override how to read from the console.
+ *
+ * If the target hasn't provided minimal_console_read, this is called
+ * to give the target a chance to specify a serial access to the console.
+ *
+ * If this is not provided, the console will be MinimalConsole
+ *
+ *  @param buffer   The buffer to read in
+ *  @param length   The number of bytes to read
+ *  @return         0 length is zero or buffer is nullptr, 1 an attempt to read was made
+ */
+ssize_t minimal_console_read(void *buffer, size_t length);
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 
 } // namespace mbed
 
