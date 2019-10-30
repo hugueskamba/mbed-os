@@ -61,20 +61,6 @@ public:
      */
     void baud(int baudrate);
 
-    /** Write a char to the serial port
-     *
-     * @param c The char to write
-     *
-     * @returns The written char
-     */
-    int putc(int c);
-
-    /** Read a char to the serial port
-     *
-     * @returns The char read from the serial port
-     */
-    int getc();
-
 protected:
     MinimalSerial(
         PinName tx,
@@ -99,16 +85,6 @@ protected:
     int _baud;
 
     serial_t _serial;
-
-#if !defined(DOXYGEN_ONLY)
-    /** Acquire exclusive access to this serial port
-     */
-    virtual void lock(void){};
-
-    /** Release exclusive access to this serial port
-     */
-    virtual void unlock(void){};
-#endif // !defined(DOXYGEN_ONLY)
 
 private:
     void init(PinName tx, PinName rx);

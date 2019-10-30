@@ -94,6 +94,7 @@ namespace mbed {
 class FileHandle;
 class DirHandle;
 
+#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 /** Targets may implement this to change stdin, stdout, stderr.
  *
  * If the application hasn't provided mbed_override_console, this is called
@@ -179,6 +180,7 @@ FileHandle *mbed_override_console(int fd);
  *           possible if it's not open with current implementation).
  */
 FileHandle *mbed_file_handle(int fd);
+#endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 }
 
 typedef mbed::DirHandle DIR;
@@ -559,7 +561,9 @@ struct pollfd {
 #if __cplusplus
 extern "C" {
 #endif
+#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
     int open(const char *path, int oflag, ...);
+#endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 #ifndef __IAR_SYSTEMS_ICC__ /* IAR provides fdopen itself */
 #if __cplusplus
     std::FILE *fdopen(int fildes, const char *mode);
@@ -576,7 +580,9 @@ extern "C" {
     int fstat(int fildes, struct stat *st);
     int fcntl(int fildes, int cmd, ...);
     int poll(struct pollfd fds[], nfds_t nfds, int timeout);
+#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
     int close(int fildes);
+#endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
     int stat(const char *path, struct stat *st);
     int statvfs(const char *path, struct statvfs *buf);
     DIR *opendir(const char *);

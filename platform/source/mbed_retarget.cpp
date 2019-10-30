@@ -139,7 +139,6 @@ void remove_filehandle(FileHandle *file)
 extern int stdio_uart_inited;
 extern serial_t stdio_uart;
 
-#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 /* Private FileHandle to implement backwards-compatible functionality of
  * direct HAL serial access for default stdin/stdout/stderr.
  * This is not a particularly well-behaved FileHandle for a stream, which
@@ -215,12 +214,14 @@ short DirectSerial::poll(short events) const
     }
     return revents;
 }
-#else
+#if (MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 /** Class providing minimal UART communication functionalities
  */
 class MinimalConsole : public MinimalSerial {
 public:
-    MinimalConsole(int baud);
+    MinimalConsole(int baud = MBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE);
+    virtual int putc(int c);
+    virtual int getc();
 };
 
 /** Create a MinimalConsole port, connected to the specified transmit and receive pins, with the specified baud.
@@ -254,6 +255,27 @@ MinimalConsole::MinimalConsole(int baud) :
 #endif
 }
 
+/** Write a char to the serial port
+ *
+ * @param c The char to write
+ *
+ * @returns The written char
+ */
+int MinimalConsole::putc(int c)
+{
+    return _base_putc(c);
+}
+
+/** Read a char to the serial port
+ *
+ * @returns The char read from the serial port
+ */
+int MinimalConsole::getc()
+{
+   return _base_getc();
+}
+
+
 /* Locate the default console */
 static MinimalConsole *get_minimal_console()
 {
@@ -263,10 +285,9 @@ static MinimalConsole *get_minimal_console()
 
     return &console;
 }
-#endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
 #endif // DEVICE_SERIAL
 
-#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 class Sink : public FileHandle {
 public:
     virtual ssize_t write(const void *buffer, size_t size);
@@ -304,7 +325,7 @@ ssize_t Sink::read(void *buffer, size_t size)
     return 1;
 }
 
-
+#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 MBED_WEAK FileHandle *mbed::mbed_target_override_console(int fd)
 {
     return NULL;
@@ -585,7 +606,7 @@ extern "C" FILEHANDLE PREFIX(_open)(const char *name, int openflags)
     return open(name, openflags_to_posix(openflags));
 #else
     // Everything goes to the same output
-    return 1;
+    return STDOUT_FILENO;
 #endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 }
 
@@ -752,7 +773,13 @@ finish:
 
 extern "C" ssize_t write(int fildes, const void *buf, size_t length)
 {
-#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY && DEVICE_SERIAL
+    if (fildes != STDOUT_FILENO && fildes != STDERR_FILENO){
+        return EBADF;
+    }
+
+    ssize_t ret = minimal_console_write(buf, length);
+#else
     FileHandle *fhc = mbed_file_handle(fildes);
     if (fhc == NULL) {
         errno = EBADF;
@@ -760,13 +787,7 @@ extern "C" ssize_t write(int fildes, const void *buf, size_t length)
     }
 
     ssize_t ret = fhc->write(buf, length);
-#else
-    if (fildes != STDOUT_FILENO && fildes != STDERR_FILENO){
-        return EBADF;
-    }
-
-    ssize_t ret = minimal_console_write(buf, length);
-#endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY && DEVICE_SERIAL
     if (ret < 0) {
         errno = -ret;
         return -1;
@@ -775,7 +796,7 @@ extern "C" ssize_t write(int fildes, const void *buf, size_t length)
     }
 }
 
-#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY && DEVICE_SERIAL
 /* Write the contents of a buffer to a serial interface */
 MBED_WEAK ssize_t minimal_console_write(const void *buffer, size_t length)
 {
@@ -789,7 +810,7 @@ MBED_WEAK ssize_t minimal_console_write(const void *buffer, size_t length)
 
     return length;
 }
-#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY && DEVICE_SERIAL
 
 #if defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
 extern "C" void PREFIX(_exit)(int return_code)
@@ -870,7 +891,13 @@ extern "C" int PREFIX(_read)(FILEHANDLE fh, unsigned char *buffer, unsigned int 
 
 extern "C" ssize_t read(int fildes, void *buf, size_t length)
 {
-#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY && DEVICE_SERIAL
+    if (fildes != STDOUT_FILENO && fildes != STDERR_FILENO){
+        return EBADF;
+    }
+
+    ssize_t ret = minimal_console_read(buf, length);
+#else
     FileHandle *fhc = mbed_file_handle(fildes);
     if (fhc == NULL) {
         errno = EBADF;
@@ -878,13 +905,7 @@ extern "C" ssize_t read(int fildes, void *buf, size_t length)
     }
 
     ssize_t ret = fhc->read(buf, length);
-#else
-    if (fildes != STDOUT_FILENO && fildes != STDERR_FILENO){
-        return EBADF;
-    }
-
-    ssize_t ret = minimal_console_read(buf, length);
-#endif //!(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY && DEVICE_SERIAL
     if (ret < 0) {
         errno = -ret;
         return -1;
@@ -893,11 +914,11 @@ extern "C" ssize_t read(int fildes, void *buf, size_t length)
     }
 }
 
-#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+#if MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY && DEVICE_SERIAL
 /* Read the serial interface and store the content to a buffer */
 MBED_WEAK ssize_t minimal_console_read(void *buffer, size_t length)
 {
-    if (length == 0) {
+    if (length == 0 || buffer == nullptr) {
         return 0;
     }
 
@@ -907,7 +928,7 @@ MBED_WEAK ssize_t minimal_console_read(void *buffer, size_t length)
     buf[0] = mc->getc();
     return 1;
 }
-#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY
+#endif // MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY && DEVICE_SERIAL
 
 
 #ifdef __ARMCC_VERSION
@@ -1012,9 +1033,10 @@ extern "C" int PREFIX(_ensure)(FILEHANDLE fh)
 #endif
 #endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 
+#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 extern "C" int fsync(int fildes)
 {
-#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
+
     FileHandle *fhc = mbed_file_handle(fildes);
     if (fhc == NULL) {
         errno = EBADF;
@@ -1028,10 +1050,8 @@ extern "C" int fsync(int fildes)
     } else {
         return 0;
     }
-#else
-    return -1;
-#endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 }
+#endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 
 #ifdef __ARMCC_VERSION
 extern "C" long PREFIX(_flen)(FILEHANDLE fh)
@@ -1488,8 +1508,10 @@ extern "C" void exit(int return_code)
 #if MBED_CONF_PLATFORM_STDIO_FLUSH_AT_EXIT
     fflush(stdout);
     fflush(stderr);
+#if !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
     fsync(STDOUT_FILENO);
     fsync(STDERR_FILENO);
+#endif // !(MBED_CONF_PLATFORM_STDIO_MINIMAL_CONSOLE_ONLY)
 #endif
 #endif
 

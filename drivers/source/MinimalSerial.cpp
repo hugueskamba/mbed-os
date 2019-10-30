@@ -58,10 +58,8 @@ void MinimalSerial::init(PinName tx, PinName rx)
 
 void MinimalSerial::baud(int baudrate)
 {
-    lock();
     serial_baud(&_serial, baudrate);
     _baud = baudrate;
-    unlock();
 }
 
 #if DEVICE_SERIAL_FC
@@ -71,7 +69,6 @@ void MinimalSerial::set_flow_control(
     PinName flow2
 )
 {
-    lock();
     FlowControl flow_type = (FlowControl)type;
     switch (type) {
         case RTS:
@@ -90,7 +87,6 @@ void MinimalSerial::set_flow_control(
         default:
             break;
     }
-    unlock();
 }
 #endif // DEVICE_SERIAL_FC
 
@@ -105,22 +101,6 @@ int MinimalSerial::_base_putc(int c)
     // Mutex is already held
     serial_putc(&_serial, c);
     return c;
-}
-
-int MinimalSerial::putc(int c)
-{
-    lock();
-    int ret = _base_putc(c);
-    unlock();
-    return ret;
-}
-
-int MinimalSerial::getc()
-{
-    lock();
-    int ret = _base_getc();
-    unlock();
-    return ret;
 }
 
 } // namespace mbed

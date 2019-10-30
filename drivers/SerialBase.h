@@ -143,6 +143,17 @@ public:
      */
     void send_break();
 
+#if !defined(DOXYGEN_ONLY)
+protected:
+
+    /** Acquire exclusive access to this serial port
+     */
+    virtual void lock(void);
+
+    /** Release exclusive access to this serial port
+     */
+    virtual void unlock(void);
+#endif
 public:
 
     static void _irq_handler(uint32_t id, SerialIrq irq_type);

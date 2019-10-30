@@ -128,6 +128,15 @@ void SerialBase::send_break()
     unlock();
 }
 
+void SerialBase::lock()
+{
+    // Stub
+}
+
+void SerialBase:: unlock()
+{
+    // Stub
+}
 
 SerialBase::~SerialBase()
 {
