@@ -220,8 +220,8 @@ short DirectSerial::poll(short events) const
 class MinimalConsole : public MinimalSerial {
 public:
     MinimalConsole(int baud = MBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE);
-    virtual int putc(int c);
-    virtual int getc();
+    int putc(int c);
+    int getc();
 };
 
 /** Create a MinimalConsole port, connected to the specified transmit and receive pins, with the specified baud.
