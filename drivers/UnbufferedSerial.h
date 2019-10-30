@@ -62,28 +62,6 @@ public:
         int baud = MBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE
     );
 
-        /** Write a char to the serial port
-     *
-     * @param c The char to write
-     *
-     * @returns The written char or -1 if an error occurred
-     */
-    int putc(int c);
-
-    /** Read a char from the serial port
-     *
-     * @returns The char read from the serial port
-     */
-    int getc();
-
-    /** Write a string to the serial port
-     *
-     * @param str The string to write
-     *
-     * @returns 0 if the write succeeds, EOF for error
-     */
-    int puts(const char *str);
-
     /** Write the contents of a buffer to a file
      *
      *  Follows POSIX semantics:

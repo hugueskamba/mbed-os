@@ -33,32 +33,6 @@ UnbufferedSerial::UnbufferedSerial(
     // No lock needed in the constructor
 }
 
-int UnbufferedSerial::getc()
-{
-    lock();
-    int ret = _base_getc();
-    unlock();
-    return ret;
-}
-
-int UnbufferedSerial::putc(int c)
-{
-    lock();
-    int ret = _base_putc(c);
-    unlock();
-    return ret;
-}
-
-int UnbufferedSerial::puts(const char *str)
-{
-    lock();
-    while (*str) {
-        putc(*str ++);
-    }
-    unlock();
-    return 0;
-}
-
 ssize_t UnbufferedSerial::write(const void *buffer, size_t size)
 {
     const unsigned char *buf = static_cast<const unsigned char *>(buffer);
