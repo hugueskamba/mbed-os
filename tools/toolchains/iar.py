@@ -69,6 +69,12 @@ class IAR(mbedToolchain):
             define_string = self.make_ld_define("DOMAIN_NS", "0x1")
             self.flags["ld"].append(define_string)
 
+        if (
+            target.printf_lib == "minimal-printf"
+            and "-DMBED_MINIMAL_PRINTF" not in self.flags["common"]
+        ):
+            self.flags["common"].append("-DMBED_MINIMAL_PRINTF")
+
         core = target.core_without_NS
         cpu = {
             "Cortex-M7F": "Cortex-M7.fp.sp",
