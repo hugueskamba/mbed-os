@@ -21,11 +21,14 @@
 
 #if DEVICE_SERIAL || defined(DOXYGEN_ONLY)
 
+#include <cstdarg>
+
 #include "drivers/SerialBase.h"
 #include "platform/FileHandle.h"
 #include "platform/mbed_toolchain.h"
 #include "platform/NonCopyable.h"
-#include <cstdarg>
+#include "platform/PlatformMutex.h"
+
 
 namespace mbed {
 
@@ -64,36 +67,28 @@ public:
 
     /** Write the contents of a buffer to a file
      *
-     *  Follows POSIX semantics:
-     *
-     * * if blocking, block until all data is written
-     * * if no data can be written, and non-blocking set, return -EAGAIN
-     * * if some data can be written, and non-blocking set, write partial
+     * Blocks until all data is written
      *
      *  @param buffer   The buffer to write from
-     *  @param length   The number of bytes to write
-     *  @return         The number of bytes written, negative error on failure
+     *  @param size     The number of bytes to write
+     *  @return         The number of bytes written
      */
     virtual ssize_t write(const void *buffer, size_t size);
 
     /** Read the contents of a file into a buffer
      *
-     *  Follows POSIX semantics:
-     *
-     *  * if no data is available, and non-blocking set return -EAGAIN
-     *  * if no data is available, and blocking set, wait until data is available
-     *  * If any data is available, call returns immediately
+     *  Blocks and reads exactly one character
      *
      *  @param buffer   The buffer to read in to
-     *  @param length   The number of bytes to read
-     *  @return         The number of bytes read, 0 at end of file, negative error on failure
+     *  @param size     The number of bytes to read
+     *  @return         The number of bytes read
      */
     virtual ssize_t read(void *buffer, size_t size);
 
     /** Move the file position to a given offset from from a given location
      *
-     * Not valid for a device type FileHandle like UARTSerial.
-     * In case of UARTSerial, returns ESPIPE
+     * Not valid for a device type FileHandle like UnbufferedSerial.
+     * In case of UnbufferedSerial, returns ESPIPE
      *
      *  @param offset   The offset from whence to move to
      *  @param whence   The start of where to seek
@@ -136,12 +131,17 @@ public:
         return 0;
     }
 
-    /**
-     * Equivalent to POSIX poll(). Derived from FileHandle.
-     * Provides a mechanism to multiplex input/output over a set of file
-     * handles.
+
+    /** Check for poll event flags
+     * Check the events listed in events to see if data can be read or written
+     * without blocking.
+     * Call is nonblocking - returns state of events.
+     *
+     * @param events        bitmask of poll events we're interested in - POLLIN/POLLOUT etc.
+     *
+     * @returns             bitmask of poll events that have occurred.
      */
-    virtual short poll(short events) const;
+    virtual short poll(short events);
 
 #if !(DOXYGEN_ONLY)
 protected:
@@ -152,6 +152,17 @@ protected:
     /* Release exclusive access to this serial port
      */
     virtual void unlock(void);
+
+private:
+
+    /** Acquire mutex */
+    virtual void api_lock(void);
+
+    /** Release mutex */
+    virtual void api_unlock(void);
+
+
+    PlatformMutex _mutex;
 #endif // !(DOXYGEN_ONLY)
 };
 

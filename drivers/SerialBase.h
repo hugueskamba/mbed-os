@@ -38,8 +38,8 @@ namespace mbed {
  * @{
  */
 
-/** An abstract base class for serial port implementations
- * Can't be instantiated in sub-classess
+/** A base class for serial port implementations
+ * Can't be instantiated directly (use UnbufferedSerial or UARTSerial)
  *
  * @note Synchronization level: Set by subclass
  */

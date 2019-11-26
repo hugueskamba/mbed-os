@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-#include "hal/serial_api.h"
-
 #include "drivers/UnbufferedSerial.h"
 
-
 #if DEVICE_SERIAL
+
+#include "platform/mbed_critical.h"
 
 namespace mbed {
 
@@ -36,9 +35,25 @@ UnbufferedSerial::UnbufferedSerial(
 ssize_t UnbufferedSerial::write(const void *buffer, size_t size)
 {
     const unsigned char *buf = static_cast<const unsigned char *>(buffer);
-    for (size_t i = 0; i < size; i++) {
-        serial_putc(&_serial, buf[i]);
+
+    if (size == 0) {
+        return 0;
     }
+
+    bool lock_api = !core_util_in_critical_section();
+
+    if (lock_api) {
+        api_lock();
+    }
+
+    for (size_t i = 0; i < size; i++) {
+        _base_putc(buf[i]);
+    }
+
+    if (lock_api) {
+        api_unlock();
+    }
+
     return size;
 }
 
@@ -48,17 +63,17 @@ ssize_t UnbufferedSerial::read(void *buffer, size_t size)
     if (size == 0) {
         return 0;
     }
-    buf[0] = serial_getc(&_serial);
+    buf[0] = _base_getc();
     return 1;
 }
 
-short UnbufferedSerial::poll(short events) const
+short UnbufferedSerial::poll(short events)
 {
     short revents = 0;
-    if ((events & POLLIN) && serial_readable((serial_t*)&_serial)) {
+    if ((events & POLLIN) && SerialBase::readable()) {
         revents |= POLLIN;
     }
-    if ((events & POLLOUT) && serial_writable((serial_t*)&_serial)) {
+    if ((events & POLLOUT) && SerialBase::writeable()) {
         revents |= POLLOUT;
     }
     return revents;
@@ -76,6 +91,16 @@ void UnbufferedSerial::lock()
 void UnbufferedSerial::unlock()
 {
     // No lock used - external synchronization required
+}
+
+void UnbufferedSerial::api_lock(void)
+{
+    _mutex.lock();
+}
+
+void UnbufferedSerial::api_unlock(void)
+{
+    _mutex.unlock();
 }
 
 } // namespace mbed

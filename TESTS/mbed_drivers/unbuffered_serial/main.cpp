@@ -41,25 +41,27 @@ using namespace utest::v1;
 #define MSG_KEY_ECHO_MESSAGE                                     "echo_message"
 #define MSG_VALUE_HELLO_WORLD                                   "Hello, world!"
 
-#define STRING_TO_SEND "{{" MSG_KEY_ECHO_MESSAGE ";" MSG_VALUE_HELLO_WORLD "}}\r\n"
 #define EXPECTED_ECHOED_STRING "{{" MSG_KEY_ECHO_MESSAGE ";" MSG_VALUE_HELLO_WORLD "}}"
+// The target is expected to transmit Greentea messages with \n (or \r\n) or they are not detected by the host
+#define STRING_TO_SEND EXPECTED_ECHOED_STRING "\n"
+
 
 static UnbufferedSerial unbuffered_serial_obj(
     USBTX, USBRX, MBED_CONF_PLATFORM_STDIO_BAUD_RATE
 );
 
-ssize_t greentea_unbuffered_serial_get_kv(void *buffer, ssize_t length)
+static ssize_t unbuffered_serial_read(void *buffer, ssize_t length)
 {
     if (length == 0) {
         return 0;
     }
 
-    // Ignore the character previously sent to the host that was not read
+    // Ignore the `\n` character previously sent to the host in the previous
+    // key-value pair that was not removed from the FIFO.
     unsigned char *buf = static_cast<unsigned char *>(buffer);
     unbuffered_serial_obj.read(buf, 1);
 
     // Get the message sent by the host
-    // unsigned char *buf = static_cast<unsigned char *>(buffer);
     for (ssize_t i = 0; i < length; i++) {
         TEST_ASSERT_EQUAL_UINT(1, unbuffered_serial_obj.read(buf+i, 1));
     }
@@ -68,6 +70,13 @@ ssize_t greentea_unbuffered_serial_get_kv(void *buffer, ssize_t length)
 }
 
 
+// Test that data sent using an UnbufferedSerial object is correctly sent.
+// The test case sends a Greentea key-value pair message from the target to the
+// host using an UnbufferedSerial object and expects the message
+// to be echoed back by the host. The host response is received via the Greentea
+// framework usual route using greentea_parse_kv(). Success is determined upon
+// reception of the echoed message which indicates that the message was received
+// by the host as it was sent by the target.
 static void test_serial_write()
 {
     char tx_msg[] = STRING_TO_SEND;
@@ -85,6 +94,13 @@ static void test_serial_write()
     TEST_ASSERT_EQUAL_STRING(MSG_VALUE_HELLO_WORLD, rx_value);
 }
 
+
+// Test that data received using an UnbufferedSerial object is correctly received.
+// The test case sends a Greentea key-value pair message from the target to the
+// host via the Greentea framework usual route using greentea_send_kv().
+// It expects the message to be echoed back to the target. An UnbufferedSerial
+// object is used to handle the received message. Succes is determined upon
+// reception of a key-value pair matching the key-value pair sent by the target.
 static void test_serial_read()
 {
     greentea_send_kv(MSG_KEY_ECHO_MESSAGE, MSG_VALUE_HELLO_WORLD);
@@ -93,10 +109,11 @@ static void test_serial_read()
     // Exclude the null terminator which is not read
     ssize_t expected_rx_msg_length = sizeof(EXPECTED_ECHOED_STRING)-1;
 
-    greentea_unbuffered_serial_get_kv(rx_msg, expected_rx_msg_length);
+    unbuffered_serial_read(rx_msg, expected_rx_msg_length);
 
     TEST_ASSERT_EQUAL_STRING(EXPECTED_ECHOED_STRING, rx_msg);
 }
+
 
 utest::v1::status_t greentea_setup(const size_t number_of_cases)
 {

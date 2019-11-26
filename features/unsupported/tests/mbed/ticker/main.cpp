@@ -1,7 +1,7 @@
 #include "mbed.h"
 #include "test_env.h"
 
-UnbufferedSerial pc(USBTX, USBRX);
+RawSerial pc(USBTX, USBRX);
 
 Ticker flipper_1;
 DigitalOut led1(LED1);
