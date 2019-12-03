@@ -16,6 +16,16 @@
             "value": false
         },
 
+        "stdio-buffered-serial-txbuf-size": {
+            "help": "Default TX buffer size in bytes for a console buffered serial I/O on stdin/stdout/stderr.",
+            "value": 128
+        },
+
+        "stdio-buffered-serial-rxbuf-size": {
+            "help": "Default RX buffer size in bytes for a console buffered serial I/O on stdin/stdout/stderr.",
+            "value": 128
+        },
+
         "stdio-minimal-console-only": {
             "help": "(Ignores stdio-buffered-serial) Creates a console for basic unbuffered I/O operations. Enable if your application does not require file handles to access the serial interface. The POSIX `fsync` function will always an error.",
             "value": false

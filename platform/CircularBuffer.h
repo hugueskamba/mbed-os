@@ -18,193 +18,38 @@
 #define MBED_CIRCULARBUFFER_H
 
 #include <stdint.h>
-#include "platform/mbed_critical.h"
-#include "platform/mbed_assert.h"
+
+#include "platform/CircularBufferBase.h"
 
 namespace mbed {
 
-namespace internal {
-/* Detect if CounterType of the Circular buffer is of unsigned type. */
-template<typename T>
-struct is_unsigned {
-    static const bool value = false;
-};
-template<>
-struct is_unsigned<unsigned char> {
-    static const bool value = true;
-};
-template<>
-struct is_unsigned<unsigned short> {
-    static const bool value = true;
-};
-template<>
-struct is_unsigned<unsigned int> {
-    static const bool value = true;
-};
-template<>
-struct is_unsigned<unsigned long> {
-    static const bool value = true;
-};
-template<>
-struct is_unsigned<unsigned long long> {
-    static const bool value = true;
-};
-};
-
 /** \addtogroup platform-public-api */
 /** @{*/
+
 /**
- * \defgroup platform_CircularBuffer CircularBuffer functions
+ * \defgroup platform_CircularBuffer CircularBuffer class
+ * \ingroup platform-public-api-circular-buffer
  * @{
  */
 
 /** Templated Circular buffer class
  *
  *  @note Synchronization level: Interrupt safe
- *  @note CounterType must be unsigned and consistent with BufferSize
+ *  @note CounterType must be unsigned and consistent with pool_size
  */
-template<typename T, uint32_t BufferSize, typename CounterType = uint32_t>
-class CircularBuffer {
+template<typename T, uint32_t pool_size, typename CounterType = uint32_t>
+class CircularBuffer : public CircularBufferBase<T> {
 public:
-    CircularBuffer() : _head(0), _tail(0), _full(false)
+    CircularBuffer() : CircularBufferBase<T>(_pool, pool_size)
     {
-        MBED_STATIC_ASSERT(
-            internal::is_unsigned<CounterType>::value,
-            "CounterType must be unsigned"
-        );
-
-        MBED_STATIC_ASSERT(
-            (sizeof(CounterType) >= sizeof(uint32_t)) ||
-            (BufferSize < (((uint64_t) 1) << (sizeof(CounterType) * 8))),
-            "Invalid BufferSize for the CounterType"
-        );
     }
 
     ~CircularBuffer()
     {
     }
 
-    /** Push the transaction to the buffer. This overwrites the buffer if it's
-     *  full
-     *
-     * @param data Data to be pushed to the buffer
-     */
-    void push(const T &data)
-    {
-        core_util_critical_section_enter();
-        if (full()) {
-            _tail++;
-            if (_tail == BufferSize) {
-                _tail = 0;
-            }
-        }
-        _pool[_head++] = data;
-        if (_head == BufferSize) {
-            _head = 0;
-        }
-        if (_head == _tail) {
-            _full = true;
-        }
-        core_util_critical_section_exit();
-    }
-
-    /** Pop the transaction from the buffer
-     *
-     * @param data Data to be popped from the buffer
-     * @return True if the buffer is not empty and data contains a transaction, false otherwise
-     */
-    bool pop(T &data)
-    {
-        bool data_popped = false;
-        core_util_critical_section_enter();
-        if (!empty()) {
-            data = _pool[_tail++];
-            if (_tail == BufferSize) {
-                _tail = 0;
-            }
-            _full = false;
-            data_popped = true;
-        }
-        core_util_critical_section_exit();
-        return data_popped;
-    }
-
-    /** Check if the buffer is empty
-     *
-     * @return True if the buffer is empty, false if not
-     */
-    bool empty() const
-    {
-        core_util_critical_section_enter();
-        bool is_empty = (_head == _tail) && !_full;
-        core_util_critical_section_exit();
-        return is_empty;
-    }
-
-    /** Check if the buffer is full
-     *
-     * @return True if the buffer is full, false if not
-     */
-    bool full() const
-    {
-        core_util_critical_section_enter();
-        bool full = _full;
-        core_util_critical_section_exit();
-        return full;
-    }
-
-    /** Reset the buffer
-     *
-     */
-    void reset()
-    {
-        core_util_critical_section_enter();
-        _head = 0;
-        _tail = 0;
-        _full = false;
-        core_util_critical_section_exit();
-    }
-
-    /** Get the number of elements currently stored in the circular_buffer */
-    CounterType size() const
-    {
-        core_util_critical_section_enter();
-        CounterType elements;
-        if (!_full) {
-            if (_head < _tail) {
-                elements = BufferSize + _head - _tail;
-            } else {
-                elements = _head - _tail;
-            }
-        } else {
-            elements = BufferSize;
-        }
-        core_util_critical_section_exit();
-        return elements;
-    }
-
-    /** Peek into circular buffer without popping
-     *
-     * @param data Data to be peeked from the buffer
-     * @return True if the buffer is not empty and data contains a transaction, false otherwise
-     */
-    bool peek(T &data) const
-    {
-        bool data_updated = false;
-        core_util_critical_section_enter();
-        if (!empty()) {
-            data = _pool[_tail];
-            data_updated = true;
-        }
-        core_util_critical_section_exit();
-        return data_updated;
-    }
-
 private:
-    T _pool[BufferSize];
-    CounterType _head;
-    CounterType _tail;
-    bool _full;
+    T _pool[pool_size];
 };
 
 /**@}*/

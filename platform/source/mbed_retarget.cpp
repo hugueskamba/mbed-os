@@ -30,7 +30,7 @@
 #include "platform/mbed_atomic.h"
 #include "platform/mbed_critical.h"
 #include "platform/mbed_poll.h"
-#include "drivers/UARTSerial.h"
+#include "drivers/BufferedSerial.h"
 #include "hal/us_ticker_api.h"
 #include "hal/lp_ticker_api.h"
 #include "hal/static_pinmap.h"
@@ -333,16 +333,29 @@ static FileHandle *default_console()
 
 #  if MBED_CONF_PLATFORM_STDIO_BUFFERED_SERIAL
     static const serial_pinmap_t console_pinmap = get_uart_pinmap(STDIO_UART_TX, STDIO_UART_RX);
-    static UARTSerial console(console_pinmap, MBED_CONF_PLATFORM_STDIO_BAUD_RATE);
+#if MBED_CONF_DRIVERS_UART_SERIAL_RXBUF_SIZE && MBED_CONF_DRIVERS_UART_SERIAL_TXBUF_SIZE
+    static BufferedSerial console(
+        STDIO_UART_TX, STDIO_UART_RX, MBED_CONF_PLATFORM_STDIO_BAUD_RATE
+    );
+#else
+    static char stdio_rx_buf[MBED_CONF_PLATFORM_STDIO_BUFFERED_SERIAL_RXBUF_SIZE];
+    static char stdio_tx_buf[MBED_CONF_PLATFORM_STDIO_BUFFERED_SERIAL_TXBUF_SIZE];
+    static BufferedSerial console(
+        STDIO_UART_TX,
+        STDIO_UART_RX,
+        (void *)stdio_rx_buf,
+        (size_t)MBED_CONF_PLATFORM_STDIO_BUFFERED_SERIAL_RXBUF_SIZE,
+        (void *)stdio_tx_buf,
+        (size_t)MBED_CONF_PLATFORM_STDIO_BUFFERED_SERIAL_TXBUF_SIZE,
+        MBED_CONF_PLATFORM_STDIO_BAUD_RATE
+    );
+#endif // MBED_CONF_DRIVERS_UART_SERIAL_RXBUF_SIZE && MBED_CONF_DRIVERS_UART_SERIAL_TXBUF_SIZE
 #   if   CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTS
-    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(STDIO_UART_RTS, NC);
-    console.serial_set_flow_control(SerialBase::RTS, fc_pinmap);
+    console.set_flow_control(SerialBase::RTS, STDIO_UART_RTS, NC);
 #   elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_CTS
-    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(NC, STDIO_UART_CTS);
-    console.serial_set_flow_control(SerialBase::CTS, fc_pinmap);
+    console.set_flow_control(SerialBase::CTS, NC, STDIO_UART_CTS);
 #   elif CONSOLE_FLOWCONTROL == CONSOLE_FLOWCONTROL_RTSCTS
-    static const serial_fc_pinmap_t fc_pinmap = get_uart_fc_pinmap(STDIO_UART_RTS, STDIO_UART_CTS);
-    console.serial_set_flow_control(SerialBase::RTSCTS, fc_pinmap);
+    console.set_flow_control(SerialBase::RTSCTS, STDIO_UART_RTS, STDIO_UART_CTS);
 #   endif
 #  else
     static const serial_pinmap_t console_pinmap = get_uart_pinmap(STDIO_UART_TX, STDIO_UART_RX);
