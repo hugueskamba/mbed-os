@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd_int.h"
 #include "whd_cdc_bdc.h"
 #include "whd_events_int.h"
@@ -474,3 +476,4 @@ uint32_t whd_wifi_deregister_event_handler(whd_interface_t ifp, uint16_t event_i
     return WHD_BADARG;
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

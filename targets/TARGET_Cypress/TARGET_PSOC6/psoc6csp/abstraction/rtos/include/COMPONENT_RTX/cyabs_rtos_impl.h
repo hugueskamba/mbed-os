@@ -26,6 +26,8 @@
 #ifndef INCLUDED_CYABS_RTOS_IMPL_H_
 #define INCLUDED_CYABS_RTOS_IMPL_H_
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "cmsis_os2.h"
 #include "rtx_os.h"
 
@@ -73,5 +75,8 @@ typedef osStatus_t cy_rtos_error_t;                    /** CMSIS definition of a
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+#endif // MBED_CONF_RTOS_PRESENT
+
 #endif /* ifndef INCLUDED_CYABS_RTOS_IMPL_H_ */
 

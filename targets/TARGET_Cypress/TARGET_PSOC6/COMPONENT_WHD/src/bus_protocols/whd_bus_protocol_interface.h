@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "cyabs_rtos.h"
 
 #include "whd.h"
@@ -126,3 +128,4 @@ extern whd_result_t whd_bus_irq_register(whd_driver_t whd_driver);
 
 #endif /* ifndef INCLUDED_WHD_BUS_PROTOCOL_INTERFACE_H_ */
 
+#endif // MBED_CONF_RTOS_PRESENT

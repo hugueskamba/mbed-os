@@ -18,6 +18,8 @@
 /** @file
  *
  */
+#if MBED_CONF_RTOS_PRESENT
+
 #include <stdlib.h>
 #include "cyabs_rtos.h"
 
@@ -515,3 +517,4 @@ done: CHECK_RETURN(whd_bus_set_backplane_window(whd_driver, CHIPCOMMON_BASE_ADDR
     return WHD_SUCCESS;
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#if MBED_CONF_RTOS_PRESENT
 
 #include <stdlib.h>
 #include "bus_protocols/whd_chip_reg.h"
@@ -1454,3 +1455,4 @@ whd_result_t whd_wlan_bus_complete_ds_wake(whd_driver_t whd_driver, whd_bool_t w
     }
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

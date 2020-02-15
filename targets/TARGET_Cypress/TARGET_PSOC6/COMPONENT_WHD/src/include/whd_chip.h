@@ -18,6 +18,8 @@
 #ifndef INCLUDED_WHD_CHIP_H
 #define INCLUDED_WHD_CHIP_H
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "cyabs_rtos.h" /* For cy_semaphore_t */
 
 #include "whd_endian.h"
@@ -391,3 +393,4 @@ extern uint32_t whd_wifi_get_btc_params(whd_driver_t whd_driver, uint32_t addres
 
 #endif /* ifndef INCLUDED_WHD_CHIP_H */
 
+#endif // MBED_CONF_RTOS_PRESENT

@@ -21,6 +21,8 @@
 #ifndef _WHD_INTERNAL_BUFFER_API_H_
 #define _WHD_INTERNAL_BUFFER_API_H_
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd.h"
 #include "whd_int.h"
 
@@ -149,3 +151,4 @@ whd_result_t whd_buffer_add_remove_at_front(whd_driver_t whd_driver, whd_buffer_
 
 #endif /* ifndef _WHD_INTERNAL_BUFFER_API_H_ */
 
+#endif // MBED_CONF_RTOS_PRESENT

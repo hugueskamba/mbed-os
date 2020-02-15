@@ -19,6 +19,7 @@
  *  Implements initialisation and other management functions for WHD system
  *
  */
+#if MBED_CONF_RTOS_PRESENT
 
 #include <stdlib.h>
 #include <string.h>
@@ -475,4 +476,6 @@ uint32_t whd_wifi_off(whd_interface_t ifp)
     whd_driver->internal_info.whd_wlan_status.state = WLAN_OFF;
     return WHD_SUCCESS;
 }
+
+#endif // MBED_CONF_RTOS_PRESENT
 

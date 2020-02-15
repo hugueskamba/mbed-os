@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd_ap.h"
 #include "whd_chip_constants.h"
 #include "whd_debug.h"
@@ -43,3 +45,4 @@ void whd_wifi_p2p_set_go_is_up(whd_driver_t whd_driver, whd_bool_t is_up)
     }
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

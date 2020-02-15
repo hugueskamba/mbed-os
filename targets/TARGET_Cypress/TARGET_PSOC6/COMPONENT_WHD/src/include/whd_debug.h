@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include <stdio.h>
 #include <stdio.h>
 #include <string.h>
@@ -138,3 +140,4 @@ typedef struct
 #endif
 #endif /* ifndef INCLUDED_WHD_DEBUG_H */
 
+#endif // MBED_CONF_RTOS_PRESENT

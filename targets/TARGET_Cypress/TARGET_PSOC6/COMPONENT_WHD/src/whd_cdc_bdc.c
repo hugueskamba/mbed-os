@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#if MBED_CONF_RTOS_PRESENT
 #include <limits.h>
 #include "whd_int.h"
 #include "whd_cdc_bdc.h"
@@ -721,4 +721,4 @@ void whd_process_bdc_event(whd_driver_t whd_driver, whd_buffer_t buffer, uint16_
         WPRINT_WHD_ERROR( ("buffer release failed in %s at %d \n", __func__, __LINE__) );
 
 }
-
+#endif // MBED_CONF_RTOS_PRESENT

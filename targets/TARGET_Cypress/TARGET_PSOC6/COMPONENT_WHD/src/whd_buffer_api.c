@@ -18,6 +18,7 @@
 /** @file
  *  Provides generic APSTA functionality that chip specific files use
  */
+#if MBED_CONF_RTOS_PRESENT
 
 #include "whd_debug.h"
 #include "whd_buffer_api.h"
@@ -218,3 +219,4 @@ whd_result_t whd_buffer_add_remove_at_front(whd_driver_t whd_driver, whd_buffer_
     return WHD_WLAN_NOFUNCTION;
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

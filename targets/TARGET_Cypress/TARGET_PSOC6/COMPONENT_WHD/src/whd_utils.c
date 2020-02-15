@@ -20,6 +20,9 @@
  *
  * Utilities to help do specialized (not general purpose) WHD specific things
  */
+
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd_debug.h"
 #include "whd_utils.h"
 #include "whd_chip_constants.h"
@@ -771,3 +774,4 @@ void whd_event_info_to_string(uint32_t cmd, uint16_t flag, uint32_t reason, char
     }
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

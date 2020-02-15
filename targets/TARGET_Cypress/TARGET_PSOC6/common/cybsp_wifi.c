@@ -23,6 +23,8 @@
 *******************************************************************************/
 #if defined(CYBSP_WIFI_CAPABLE)
 
+#if MBED_CONF_LWIP_PRESENT
+
 #include "cybsp.h"
 #include "cybsp_wifi.h"
 #include "cy_network_buffer.h"
@@ -247,5 +249,7 @@ whd_driver_t cybsp_get_wifi_driver(void)
 #if defined(__cplusplus)
 }
 #endif
+
+#endif // MBED_CONF_LWIP_PRESENT
 
 #endif /* defined(CYBSP_WIFI_CAPABLE) */

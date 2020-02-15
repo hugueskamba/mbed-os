@@ -21,6 +21,8 @@
 #ifndef INCLUDED_WHD_AP_H
 #define INCLUDED_WHD_AP_H
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd.h"
 #include "cyabs_rtos.h"
 
@@ -97,6 +99,8 @@ extern whd_result_t whd_wifi_set_ampdu_parameters(whd_interface_t ifp);
 #ifdef __cplusplus
 } /*extern "C" */
 #endif
+
+#endif // MBED_CONF_RTOS_PRESENT
 
 #endif /* ifndef INCLUDED_WHD_AP_H */
 

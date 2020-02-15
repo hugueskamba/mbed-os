@@ -22,6 +22,8 @@
 #ifndef INCLUDED_WHD_INT_H
 #define INCLUDED_WHD_INT_H
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd_thread.h"
 #include "whd_sdpcm.h"
 #include "whd_cdc_bdc.h"
@@ -111,3 +113,4 @@ whd_interface_t whd_get_primary_interface(whd_driver_t whd_driver);
 #endif
 #endif /* INCLUDED_WHD_INT_H */
 
+#endif // MBED_CONF_RTOS_PRESENT

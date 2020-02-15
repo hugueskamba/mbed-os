@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd_chip_constants.h"
 #include "whd_wlioctl.h"
 #include "whd_int.h"
@@ -360,3 +362,4 @@ whd_result_t get_wl_chanspec_ctl_sb_mask(uint16_t wlan_chip_id, uint32_t *sb_mas
     return WHD_SUCCESS;
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

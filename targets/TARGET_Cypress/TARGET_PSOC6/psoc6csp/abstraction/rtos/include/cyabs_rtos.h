@@ -28,6 +28,8 @@
 #ifndef INCLUDED_CY_RTOS_INTERFACE_H_
 #define INCLUDED_CY_RTOS_INTERFACE_H_
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "cyabs_rtos_impl.h"
 #include "cy_result.h"
 #include <stdint.h>
@@ -670,3 +672,4 @@ cy_rslt_t cy_rtos_delay_milliseconds(cy_time_t num_ms);
 #endif
 #endif /* ifndef INCLUDED_CY_RTOS_INTERFACE_H_ */
 
+#endif // MBED_CONF_RTOS_PRESENT

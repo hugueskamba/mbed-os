@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd_debug.h"
 #include "whd_int.h"
 #include "bus_protocols/whd_bus_protocol_interface.h"
@@ -60,3 +62,5 @@ uint32_t whd_print_stats(whd_driver_t whd_driver, whd_bool_t reset_after_print)
     return WHD_SUCCESS;
 }
 
+
+#endif // MBED_CONF_RTOS_PRESENT

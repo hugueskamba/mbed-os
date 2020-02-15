@@ -22,6 +22,7 @@
  * This file provides functions which are not directly exposed to user but, called by end-user functions which allow actions such as
  * seting the MAC address, getting channel info, etc
  */
+#if MBED_CONF_RTOS_PRESENT
 
 #include "whd_ap.h"
 #include "whd_chip_constants.h"
@@ -109,3 +110,4 @@ uint32_t whd_wifi_set_mac_address(whd_interface_t ifp, whd_mac_t mac)
     return WHD_SUCCESS;
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

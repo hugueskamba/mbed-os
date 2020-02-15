@@ -18,6 +18,7 @@
 /** @file
  *  Provides generic APSTA functionality that chip specific files use
  */
+#if MBED_CONF_RTOS_PRESENT
 
 #include "whd_debug.h"
 #include "whd_network_if.h"
@@ -83,3 +84,4 @@ whd_result_t whd_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t
     return WHD_WLAN_NOFUNCTION;
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

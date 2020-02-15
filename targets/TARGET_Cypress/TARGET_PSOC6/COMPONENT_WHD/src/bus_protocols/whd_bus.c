@@ -18,7 +18,7 @@
 /** @file
  *
  */
-
+#if MBED_CONF_RTOS_PRESENT
 #include "whd_bus.h"
 #include "whd_int.h"
 
@@ -143,3 +143,4 @@ whd_result_t whd_bus_irq_enable(whd_driver_t whd_driver, whd_bool_t enable)
     return whd_driver->bus_if->whd_bus_irq_enable_fptr(whd_driver, enable);
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

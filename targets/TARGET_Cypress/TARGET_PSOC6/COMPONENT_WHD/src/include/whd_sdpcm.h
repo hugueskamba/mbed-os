@@ -24,6 +24,8 @@
 #ifndef INCLUDED_WHD_SDPCM_H
 #define INCLUDED_WHD_SDPCM_H
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd.h"
 #include "whd_events_int.h"
 #include "cyabs_rtos.h"
@@ -122,3 +124,4 @@ extern void whd_send_to_bus(whd_driver_t whd_driver, whd_buffer_t buffer,
 
 #endif /* ifndef INCLUDED_WHD_SDPCM_H */
 
+#endif // MBED_CONF_RTOS_PRESENT

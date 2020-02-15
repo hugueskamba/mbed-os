@@ -23,6 +23,8 @@
 #ifndef INCLUDED_WHD_TYPES_INT_H_
 #define INCLUDED_WHD_TYPES_INT_H_
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include <stdint.h>
 #include <stddef.h>
 #include <inttypes.h>
@@ -405,3 +407,4 @@ extern uint32_t whd_wifi_set_mac_address(whd_interface_t ifp, whd_mac_t mac);
 #endif
 #endif /* ifndef INCLUDED_WHD_TYPES_INT_H_ */
 
+#endif // MBED_CONF_RTOS_PRESENT

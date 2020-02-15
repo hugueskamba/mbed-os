@@ -20,6 +20,9 @@
  *
  * Utilities to help do specialized (not general purpose) WHD specific things
  */
+
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd_chip.h"
 #include "whd_events_int.h"
 #include "whd_types_int.h"
@@ -156,4 +159,4 @@ extern wl_chanspec_t whd_channel_to_wl_band(whd_driver_t whd_driver, uint32_t ch
 } /* extern "C" */
 #endif
 #endif
-
+#endif // MBED_CONF_RTOS_PRESENT

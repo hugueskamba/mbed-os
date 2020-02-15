@@ -23,6 +23,8 @@
  *  sending/receiving raw packets etc
  */
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include <stdlib.h>
 #include "cyabs_rtos.h"
 #include "cyhal_sdio.h"
@@ -1467,3 +1469,4 @@ static whd_result_t whd_bus_sdio_deinit_oob_intr(whd_driver_t whd_driver)
     return WHD_SUCCESS;
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

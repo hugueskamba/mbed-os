@@ -23,6 +23,8 @@
  *
  */
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include <stdlib.h>
 #include "whd_version.h"
 #include "whd_chip_constants.h"
@@ -3467,3 +3469,4 @@ uint32_t whd_wifi_set_coex_config(whd_interface_t ifp, whd_coex_config_t *coex_c
                                      sizeof(whd_btc_lescan_params_t) );
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

@@ -25,6 +25,8 @@
 
 #if defined(CYBSP_WIFI_CAPABLE)
 
+#if MBED_CONF_LWIP_PRESENT
+
 #include <stdlib.h>
 #include "cy_network_buffer.h"
 #include "cy_utils.h"
@@ -108,5 +110,7 @@ whd_result_t cy_buffer_add_remove_at_front(whd_buffer_t *buffer, int32_t add_rem
 
     return WHD_SUCCESS;
 }
+
+#endif // MBED_CONF_LWIP_PRESENT
 
 #endif /* defined(CYBSP_WIFI_CAPABLE) */

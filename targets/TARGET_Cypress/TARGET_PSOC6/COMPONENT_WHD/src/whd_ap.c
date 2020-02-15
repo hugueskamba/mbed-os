@@ -18,6 +18,9 @@
 /** @file
  *  Provides generic APSTA functionality that chip specific files use
  */
+
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd_debug.h"
 #include "whd_ap.h"
 #include "bus_protocols/whd_chip_reg.h"
@@ -763,3 +766,4 @@ uint32_t whd_wifi_stop_ap(whd_interface_t ifp)
     return WHD_SUCCESS;
 }
 
+#endif MBED_CONF_RTOS_PRESENT

@@ -31,6 +31,7 @@
  *  Received messages are delivered in the context of the whd Thread, so the callback function needs to avoid blocking.
  *
  */
+#if MBED_CONF_RTOS_PRESENT
 #include "cyabs_rtos.h"
 #include "whd.h"
 
@@ -90,3 +91,4 @@ extern void whd_thread_notify_irq(whd_driver_t whd_driver);
 
 #endif /* ifndef INCLUDED_WHD_THREAD_H_ */
 
+#endif // MBED_CONF_RTOS_PRESENT

@@ -22,6 +22,8 @@
 * limitations under the License.
 *******************************************************************************/
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include <stdlib.h>
 #include "cy_utils.h"
 #include "cyabs_rtos.h"
@@ -840,3 +842,5 @@ cy_rslt_t cy_rtos_delay_milliseconds(cy_time_t num_ms)
 #if defined(__cplusplus)
 }
 #endif
+
+#endif // MBED_CONF_RTOS_PRESENT

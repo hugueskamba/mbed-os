@@ -22,6 +22,9 @@
  *  It is required when communicating with Broadcom 802.11 devices.
  *
  */
+
+#if MBED_CONF_RTOS_PRESENT
+
 #include "whd_sdpcm.h"
 #include "bus_protocols/whd_bus_protocol_interface.h"
 #include "whd_endian.h"
@@ -616,3 +619,4 @@ static void whd_sdpcm_set_next_buffer_in_queue(whd_driver_t whd_driver, whd_buff
     packet->queue_next = buffer;
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

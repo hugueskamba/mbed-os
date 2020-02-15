@@ -33,6 +33,9 @@
  *  @ref whd_thread_receive_one_packet or @ref whd_thread_poll_all functions
  *
  */
+
+#if MBED_CONF_RTOS_PRESENT
+
 #include "stdlib.h"
 #include "whd_debug.h"
 #include "whd_thread.h"
@@ -344,3 +347,4 @@ static void whd_thread_func(whd_thread_arg_t thread_input)
     (void)cy_rtos_exit_thread();
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

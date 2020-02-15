@@ -22,6 +22,7 @@
  *  Provides functions for initialising, de-intitialising 802.11 device,
  *  sending/receiving raw packets etc
  */
+#if MBED_CONF_RTOS_PRESENT
 
 #include <stdlib.h>
 #include <string.h>  /* For memcpy */
@@ -1036,3 +1037,4 @@ whd_result_t whd_bus_spi_irq_enable(whd_driver_t whd_driver, whd_bool_t enable)
     return WHD_TRUE;
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

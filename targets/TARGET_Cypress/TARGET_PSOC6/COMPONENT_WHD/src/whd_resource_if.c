@@ -18,6 +18,7 @@
 /** @file
  *  Provides generic APSTA functionality that chip specific files use
  */
+#if MBED_CONF_RTOS_PRESENT
 
 #include "whd_debug.h"
 #include "whd_int.h"
@@ -101,3 +102,4 @@ uint32_t whd_get_resource_block(whd_driver_t whd_driver, whd_resource_type_t typ
     return WHD_WLAN_NOFUNCTION;
 }
 
+#endif // MBED_CONF_RTOS_PRESENT

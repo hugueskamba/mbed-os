@@ -19,6 +19,8 @@
  *  Provides generic clm blob file download functionality
  */
 
+#if MBED_CONF_RTOS_PRESENT
+
 #include <stdlib.h>
 #include "whd_clm.h"
 #include "whd_wlioctl.h"
@@ -170,3 +172,4 @@ whd_result_t whd_process_clm_data(whd_interface_t ifp)
     return ret;
 }
 
+#endif // MBED_CONF_RTOS_PRESENT
