@@ -10,8 +10,10 @@ if(POLICY CMP0076)
     cmake_policy(SET CMP0076 NEW)
 endif()
 
+add_subdirectory(cmsis)
+
 # Create Mbed OS library
-add_library(mbed-os OBJECT)
+add_library(mbed-os STATIC)
 
 include(${MBED_CONFIG_PATH}/mbed_config.cmake)
 
@@ -45,7 +47,6 @@ target_include_directories(mbed-os
 )
 
 # Default build
-add_subdirectory(cmsis)
 add_subdirectory(components)
 add_subdirectory(connectivity)
 add_subdirectory(drivers)
@@ -57,6 +58,9 @@ add_subdirectory(rtos)
 add_subdirectory(storage)
 add_subdirectory(targets)
 
+target_link_libraries(mbed-os
+    cmsis
+)
 
 #
 # Configures the application
