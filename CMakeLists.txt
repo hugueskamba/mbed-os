@@ -11,14 +11,12 @@ if(POLICY CMP0076)
 endif()
 
 add_subdirectory(cmsis)
+add_subdirectory(rtos/source/TARGET_CORTEX)
 
 # Create Mbed OS library
 add_library(mbed-os STATIC)
 
 include(${MBED_CONFIG_PATH}/mbed_config.cmake)
-
-include(${MBED_ROOT}/cmake/core.cmake)
-mbed_set_cpu_core_options(mbed-os ${MBED_TOOLCHAIN})
 
 include(${MBED_ROOT}/cmake/toolchain.cmake)
 mbed_set_toolchain_options(mbed-os)
@@ -59,7 +57,9 @@ add_subdirectory(storage)
 add_subdirectory(targets)
 
 target_link_libraries(mbed-os
-    cmsis
+    PUBLIC
+        cmsis
+        rtos
 )
 
 #

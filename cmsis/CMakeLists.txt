@@ -27,5 +27,6 @@ target_include_directories(cmsis
 )
 
 target_link_libraries(cmsis
-    mbed-os
+    PUBLIC
+        mbed-os
 )
