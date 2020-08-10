@@ -20,6 +20,8 @@ mbed_set_cpu_core_options(mbed-os ${MBED_TOOLCHAIN})
 
 include(${MBED_ROOT}/cmake/toolchain.cmake)
 mbed_set_toolchain_options(mbed-os)
+mbed_set_language_standard(${APP_TARGET})
+mbed_set_language_standard(mbed-os)
 
 include(${MBED_ROOT}/cmake/profile.cmake)
 mbed_set_profile_options(mbed-os ${MBED_TOOLCHAIN})
