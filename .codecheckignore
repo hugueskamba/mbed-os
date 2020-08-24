@@ -1,5 +1,4 @@
 ^BUILD
-^cmsis
 ^connectivity/drivers/ble
 ^connectivity/FEATURE_BLE
 ^connectivity/libraries/mbed-coap
@@ -22,8 +21,9 @@
 ^platform/cxxsupport
 ^platform/tests/UNITTESTS
 ^events/tests/UNITTESTS
-^rtos/source/TARGET_CORTEX/rtx4
-^rtos/source/TARGET_CORTEX/rtx5
+^rtos/CMSIS_5/CMSIS/RTOS2
+^rtos/CMSIS_5/CMSIS/TARGET_CORTEX_A
+^rtos/CMSIS_5/CMSIS/TARGET_CORTEX_M
 ^targets
 ^TESTS/mbed_hal/trng/pithy
 ^TESTS/mbed_hal/trng/pithy
