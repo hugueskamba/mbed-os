@@ -25,6 +25,8 @@ include(${MBED_ROOT}/cmake/core.cmake)
 include(${MBED_ROOT}/cmake/util.cmake)
 include(${MBED_ROOT}/cmake/profile.cmake)
 
+add_subdirectory(cmsis)
+
 # Create Mbed OS library
 add_library(mbed-os OBJECT)
 
@@ -51,7 +53,6 @@ target_include_directories(mbed-os
 )
 
 # Default build
-add_subdirectory(cmsis)
 add_subdirectory(components)
 add_subdirectory(connectivity)
 add_subdirectory(drivers)
@@ -63,6 +64,12 @@ add_subdirectory(rtos)
 add_subdirectory(storage)
 add_subdirectory(targets)
 
+target_link_libraries(mbed-os
+    INTERFACE
+        $<TARGET_OBJECTS:mbed-os-cmsis>
+        $<TARGET_OBJECTS:mbed-os-cmsis_5-rtos2>
+        $<TARGET_OBJECTS:mbed-os-cmsis-device-rtos>
+)
 
 #
 # Configures the application
