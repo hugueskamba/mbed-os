@@ -78,9 +78,9 @@ target_include_directories(mbed-os
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# TODO CMake: This component is made visible here so its source files in
-# drivers/ can be added and it can be linked against by libraries in storage/.
-# Should the source files be moved from drivers/ to storage/ ?
+# The target(s) is(are) made visible here so its(their) source files
+# in various subdirectories can reference them.
+# TODO CMake: Should the source files be moved?
 add_library(mbed-os-device_key INTERFACE)
 
 add_subdirectory(cmsis)
@@ -92,6 +92,8 @@ add_subdirectory(targets)
 
 # The directories below contain optional target libraries
 add_subdirectory(events EXCLUDE_FROM_ALL)
+add_subdirectory(cmsis/CMSIS_5/CMSIS/RTOS2 EXCLUDE_FROM_ALL)
+add_subdirectory(cmsis/device/rtos EXCLUDE_FROM_ALL)
 add_subdirectory(connectivity EXCLUDE_FROM_ALL)
 add_subdirectory(storage EXCLUDE_FROM_ALL)
 add_subdirectory(drivers/device_key EXCLUDE_FROM_ALL)

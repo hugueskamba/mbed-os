@@ -6,5 +6,3 @@ if("CORTEX_A" IN_LIST MBED_TARGET_LABELS)
 elseif("CORTEX_M" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(TARGET_CORTEX_M)
 endif()
-
-add_subdirectory(RTOS2)
