@@ -29,7 +29,10 @@ endfunction()
 function(_mbed_get_cortex_a_exception_handlers)
     foreach(key ${MBED_TARGET_LABELS})
         if(${key} STREQUAL CORTEX_A)
-            target_sources(mbed-os PRIVATE Config/TARGET_CORTEX_A/handlers.c)
+            target_sources(mbed-os
+                PRIVATE
+                    Config/TARGET_CORTEX_A/handlers.c
+            )
         endif()
     endforeach()
 endfunction()

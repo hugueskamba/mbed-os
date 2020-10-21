@@ -23,11 +23,12 @@ target_include_directories(mbed-os
         include
 )
 
-target_sources(mbed-os PRIVATE
-    source/mbed_boot.c
-    source/mbed_rtos_rtx.c
-    source/mbed_rtx_handlers.c
-    source/mbed_rtx_idle.cpp
+target_sources(mbed-os
+    PRIVATE
+        source/mbed_boot.c
+        source/mbed_rtos_rtx.c
+        source/mbed_rtx_handlers.c
+        source/mbed_rtx_idle.cpp
 )
 
 target_compile_definitions(mbed-os

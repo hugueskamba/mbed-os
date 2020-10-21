@@ -9,7 +9,7 @@ target_include_directories(mbed-os
 )
 
 target_sources(mbed-os
-    PRIVATE
+    PUBLIC
         Source/os_systick.c
         Source/os_tick_ptim.c
 )
