@@ -3,43 +3,6 @@
 
 # Sets cpu core options
 function(mbed_set_cpu_core_options target mbed_toolchain)
-    if(${mbed_toolchain} STREQUAL "GCC_ARM")
-        list(APPEND common_toolchain_options
-            "-mthumb-interwork"
-            "-marm"
-            "-march=armv7-a"
-            "-mfpu=vfpv3"
-            "-mfloat-abi=hard"
-            "-mno-unaligned-access"
-        )
-
-        target_compile_options(${target}
-            PUBLIC
-                ${common_toolchain_options}
-        )
-
-        target_link_options(${target}
-            PUBLIC
-                ${common_toolchain_options}
-        )
-    elseif(${mbed_toolchain} STREQUAL "ARM")
-        list(APPEND compile_options
-            "-mcpu=cortex-a9"
-        )
-
-        target_compile_options(${target}
-            PUBLIC
-                $<$<COMPILE_LANGUAGE:C>:${compile_options}>
-                $<$<COMPILE_LANGUAGE:CXX>:${compile_options}>
-                $<$<COMPILE_LANGUAGE:ASM>:-mcpu=Cortex-A9>
-        )
-
-        target_link_options(${target}
-            PUBLIC
-                "--cpu=Cortex-A9"
-        )
-    endif()
-
     target_compile_definitions(${target}
         PUBLIC
             __CORTEX_A9
@@ -49,4 +12,43 @@ function(mbed_set_cpu_core_options target mbed_toolchain)
             __EVAL
             __MBED_CMSIS_RTOS_CA9
     )
+
+    if(NOT CMAKE_TOOLCHAIN_FILE)
+        if(${mbed_toolchain} STREQUAL "GCC_ARM")
+            list(APPEND common_toolchain_options
+                "-mthumb-interwork"
+                "-marm"
+                "-march=armv7-a"
+                "-mfpu=vfpv3"
+                "-mfloat-abi=hard"
+                "-mno-unaligned-access"
+            )
+
+            target_compile_options(${target}
+                PUBLIC
+                    ${common_toolchain_options}
+            )
+
+            target_link_options(${target}
+                PUBLIC
+                    ${common_toolchain_options}
+            )
+        elseif(${mbed_toolchain} STREQUAL "ARM")
+            list(APPEND compile_options
+                "-mcpu=cortex-a9"
+            )
+
+            target_compile_options(${target}
+                PUBLIC
+                    $<$<COMPILE_LANGUAGE:C>:${compile_options}>
+                    $<$<COMPILE_LANGUAGE:CXX>:${compile_options}>
+                    $<$<COMPILE_LANGUAGE:ASM>:-mcpu=Cortex-A9>
+            )
+
+            target_link_options(${target}
+                PUBLIC
+                    "--cpu=Cortex-A9"
+            )
+        endif()
+    endif()
 endfunction()

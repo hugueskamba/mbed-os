@@ -10,9 +10,6 @@ if(POLICY CMP0076)
     cmake_policy(SET CMP0076 NEW)
 endif()
 
-include(${MBED_ROOT}/tools/cmake/core.cmake)
-include(${MBED_ROOT}/tools/cmake/profile.cmake)
-
 add_library(mbed-core OBJECT)
 # TODO CMAKE: Replace mbed-os by a new one that will include mbed-core and mbed-rtos
 add_library(mbed-os ALIAS mbed-core)
@@ -175,7 +172,7 @@ function(mbed_generate_map_file target)
              ${CMAKE_BINARY_DIR}
          COMMENT
              "Displaying memory map for ${target}"
-)
+    )
 endfunction()
 
 #

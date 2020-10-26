@@ -1,7 +1,15 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
+option(THIRD_PARTY_TOOLCHAIN_IN_USE "Indicates whether a thirs-party toolchain was used or not")
+if(CMAKE_TOOLCHAIN_FILE)
+    set(THIRD_PARTY_TOOLCHAIN_IN_USE ON)
+else()
+    set(THIRD_PARTY_TOOLCHAIN_IN_USE OFF)
+endif()
 
 include(${MBED_CONFIG_PATH}/mbed_config.cmake)
+include(${MBED_ROOT}/tools/cmake/core.cmake)
+include(${MBED_ROOT}/tools/cmake/profile.cmake)
 
 # Set default toolchain file
 if(NOT CMAKE_TOOLCHAIN_FILE)

@@ -3,7 +3,7 @@
 
 # Sets cpu core options
 function(mbed_set_cpu_core_options target mbed_toolchain)
-    target_compile_definitions(${target}
+    target_compile_definitions(mbed-core
         PUBLIC
             __CORTEX_M4
             ARM_MATH_CM4
@@ -19,13 +19,13 @@ function(mbed_set_cpu_core_options target mbed_toolchain)
             "-mfpu=fpv4-sp-d16"
             "-mfloat-abi=softfp"
         )
-
-        target_compile_options(${target}
+        
+        target_compile_options(mbed-core
             PUBLIC
                 ${common_toolchain_options}
         )
 
-        target_link_options(${target}
+        target_link_options(mbed-core
             PUBLIC
                 ${common_toolchain_options}
         )
@@ -36,14 +36,14 @@ function(mbed_set_cpu_core_options target mbed_toolchain)
             "-mfloat-abi=hard"
         )
 
-        target_compile_options(${target}
+        target_compile_options(mbed-core
             PUBLIC
                 $<$<COMPILE_LANGUAGE:C>:${compile_options}>
                 $<$<COMPILE_LANGUAGE:CXX>:${compile_options}>
                 $<$<COMPILE_LANGUAGE:ASM>:-mcpu=Cortex-M4>
         )
 
-        target_link_options(${target}
+        target_link_options(mbed-core
             PUBLIC
                 "--cpu=Cortex-M4"
         )
