@@ -7,7 +7,7 @@ if(CCACHE)
     set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
 endif()
 
-include(${MBED_CONFIG_PATH}/mbed_config.cmake)
+include(${MBED_CONFIG_FILE})
 
 # Set default toolchain file
 if(NOT CMAKE_TOOLCHAIN_FILE)
