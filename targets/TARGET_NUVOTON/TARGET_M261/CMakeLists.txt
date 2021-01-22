@@ -2,13 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 if("NUMAKER_IOT_M263A" IN_LIST MBED_TARGET_LABELS)
-    add_subdirectory(TARGET_NUMAKER_IOT_M263A)
+    target_include_directories(mbed-core
+        INTERFACE
+            TARGET_NUMAKER_IOT_M263A
+    )
 endif()
 
 if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
     set(LINKER_FILE device/TOOLCHAIN_GCC_ARM/M261.ld)
 elseif(${MBED_TOOLCHAIN} STREQUAL "ARM")
-    set(LINKER_FILE device/TOOLCHAIN_ARM_STD/M261.sct)
+    set(LINKER_FILE device/TOOLCHAIN_ARMC6/M261.sct)
 endif()
 
 set_property(GLOBAL PROPERTY MBED_TARGET_LINKER_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
@@ -18,7 +21,7 @@ target_sources(mbed-core
         analogin_api.c
         analogout_api.c
         device/startup_M261.c
-        device/system_M251.c
+        device/system_M261.c
 
         device/StdDriver/m261_acmp.c
         device/StdDriver/m261_bpwm.c
@@ -82,5 +85,5 @@ target_include_directories(mbed-core
         crypto
         device
         device/Reg
-        device/StdDriver/inc
+        device/StdDriver
 )

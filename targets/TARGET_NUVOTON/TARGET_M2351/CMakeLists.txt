@@ -6,7 +6,10 @@ if("M23_NS" IN_LIST MBED_TARGET_LABELS)
 elseif("M23_S" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(TARGET_M23_S)
 elseif("NU_PFM_M2351" IN_LIST MBED_TARGET_LABELS)
-    add_subdirectory(TARGET_NU_PFM_M2351)
+    target_include_directories(mbed-core
+        INTERFACE
+            TARGET_NU_PFM_M2351
+    )
 endif()
 
 target_sources(mbed-core
