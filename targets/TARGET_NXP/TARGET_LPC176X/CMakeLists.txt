@@ -1,16 +1,23 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+include(${MBED_PATH}/targets/TARGET_NXP/scripts/mbed_set_post_build_nxp.cmake)
+
+
 if("ARCH_PRO" IN_LIST MBED_TARGET_LABELS)
     target_include_directories(mbed-core
         INTERFACE
             TARGET_ARCH_PRO
     )
+
+    mbed_post_build_lpc_patch_vtable()
 elseif("MBED_LPC1768" IN_LIST MBED_TARGET_LABELS)
     target_include_directories(mbed-core
         INTERFACE
             TARGET_MBED_LPC1768
     )
+
+    mbed_post_build_lpc_patch_vtable()
 endif()
 
 if(${MBED_TOOLCHAIN} STREQUAL "ARM")

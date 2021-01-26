@@ -36,6 +36,17 @@ The following targets are supported:
 - Toshiba targets
 - WICED targets
 
+The post build operations for some Mbed targets require the following
+Python modules:
+
+* [`tools/targets/PSOC6.py`](../targets/PSOC6.py)
+* [`tools/targets/LPC.py`](../targets/LPC.py)
+* [`tools/targets/ARM_MUSCA_S1.py`](../targets/ARM_MUSCA_S1.py)
+* [`tools/targets/ARM_MUSCA_B1.py`](../targets/ARM_MUSCA_B1.py)
+
+These scripts import Python modules written for the old tools, this dependency
+can be removed when support for the old tools is dropped.
+
 ### Supported toolchains
 
 Arm Compiler 6 and GNU Arm Embedded toolchains are supported.

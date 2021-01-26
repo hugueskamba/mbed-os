@@ -1,6 +1,6 @@
 """
 mbed SDK
-Copyright (c) 2011-2013 ARM Limited
+Copyright (c) 2011-2021 ARM Limited
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ causes the checksum of the first 8 table entries to be 0. The boot loader code c
 the first 8 locations in sector 0 of the flash. If the result is 0, then execution control is
 transferred to the user code.
 """
+import os
+import sys
 from struct import unpack, pack
 
 
@@ -44,7 +46,7 @@ def is_patched(bin_path):
         return (sum([unpack('<I', bin.read(4))[0] for _ in range(8)]) & 0xFFFFFFFF) == 0
 
 
-if __name__ == '__main__':
-    bin_path = "C:/Users/emimon01/releases/emilmont/build/test/LPC1768/ARM/MBED_A1/basic.bin"
-    patch(bin_path)
-    assert is_patched(bin_path), "The file is not patched"
+if __name__ == "__main__":
+    binary = sys.argv[1]
+    print("LPC Patch: %s" % os.path.split(binary)[1])
+    patch(binary)

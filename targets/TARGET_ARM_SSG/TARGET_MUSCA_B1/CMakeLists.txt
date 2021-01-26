@@ -1,6 +1,8 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+include(${MBED_PATH}/targets/TARGET_ARM_SSG/scripts/mbed_set_post_build_arm_ssg.cmake)
+
 if(${MBED_TOOLCHAIN} STREQUAL "ARM")
     set(LINKER_FILE device/TOOLCHAIN_ARMC6/musca_ns.sct)
     set(STARTUP_FILE device/TOOLCHAIN_ARMC6/startup_cmsdk_musca_ns.S)
@@ -51,4 +53,8 @@ target_sources(mbed-core
 target_link_libraries(mbed-core
     INTERFACE
         ${CMAKE_CURRENT_SOURCE_DIR}/s_veneers.o
+)
+
+mbed_post_build_musca_b1_merge_secure_bin(
+    "${MBED_PATH}/targets/TARGET_ARM_SSG/TARGET_MUSCA_B1/tfm_s.bin"
 )
