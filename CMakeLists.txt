@@ -192,6 +192,14 @@ function(mbed_generate_bin_hex target)
             "executable:"
         VERBATIM
     )
+
+    if(TARGET mbed-post-build-bin)
+        add_custom_target(mbed-post-build
+            ALL
+            DEPENDS
+                mbed-post-build-bin
+        )
+    endif()
 endfunction()
 
 #

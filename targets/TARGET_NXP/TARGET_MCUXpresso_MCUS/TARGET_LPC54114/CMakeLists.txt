@@ -1,6 +1,8 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+include(${MBED_PATH}/targets/TARGET_NXP/scripts/mbed_set_post_build_nxp.cmake)
+
 if("LPCXpresso" IN_LIST MBED_TARGET_LABELS)
     target_include_directories(mbed-core
         INTERFACE
@@ -37,6 +39,8 @@ if("LPC54114_M4" IN_LIST MBED_TARGET_LABELS)
         INTERFACE
             device/TARGET_LPC54114_M4/system_LPC54114_cm4.c
     )
+
+    mbed_post_build_lpc_patch_vtable()
 endif()
 
 set_property(GLOBAL PROPERTY MBED_TARGET_LINKER_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})

@@ -1,6 +1,8 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+include(${MBED_PATH}/targets/TARGET_NXP/scripts/mbed_set_post_build_nxp.cmake)
+
 if("FF_LPC546XX" IN_LIST MBED_TARGET_LABELS)
     target_include_directories(mbed-core
         INTERFACE
@@ -31,7 +33,7 @@ endif()
 if(${MBED_TOOLCHAIN} STREQUAL "ARM")
     set(STARTUP_FILE device/TOOLCHAIN_ARM_STD/startup_LPC54628.S)
     set(LINKER_FILE device/TOOLCHAIN_ARM_STD/LPC54628J512.sct)
-    set(LIB_POWER device/TOOLCHAIN_ARMC6/lib_power.ar)
+    set(LIB_POWER device/TOOLCHAIN_ARM_STD/lib_power.ar)
 elseif(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
     set(STARTUP_FILE device/TOOLCHAIN_GCC_ARM/startup_LPC54628.S)
     set(LINKER_FILE device/TOOLCHAIN_GCC_ARM/LPC54628J512.ld)
@@ -100,3 +102,5 @@ target_sources(mbed-core
 
         ${STARTUP_FILE}
 )
+
+mbed_post_build_lpc_patch_vtable()
