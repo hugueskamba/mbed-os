@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2017-2018 Future Electronics
 # Copyright (c) 2018-2019 Cypress Semiconductor Corporation
-# Copyright (c) 2020 Arm Limited
+# Copyright (c) 2020-2021 Arm Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,15 +58,6 @@ MCUBOOT_HEADER_SIZE = 1024
 SPE_IMAGE_ID = 1
 NSPE_IMAGE_ID = 16
 SMIF_MEM_MAP_START = 0x18000000
-
-# Mapping from mbed target to cysecuretools target
-TARGET_MAPPING = {
-        "CY8CKIT064B0S2_4343W": "cy8ckit-064b0s2-4343w",
-        "CYTFM_064B0S2_4343W"  : "cy8ckit-064b0s2-4343w",
-        "CY8CPROTO_064B0S1_BLE": "cy8cproto-064b0s1-ble",
-        "CY8CPROTO_064S1_SB"   : "cy8cproto-064s1-sb",
-        "CY8CPROTO_064B0S3"    : "cy8cproto-064b0s3"
-}
 
 class AddSignatureError(Exception):
     """ A simple class that represents all the exceptions associated with
@@ -182,7 +173,6 @@ def sign_image(
     :param m4hex: The path to the Cortex-M4 HEX file
     :param m0hex: The path to the Cortex-M0 HEX file
     """
-    print(f"build_dir = {build_dir}\nm0hex_filename = {m0hex_filename}\ntarget_name = {target_name}\npolicy = {policy}\nboot_scheme = {boot_scheme}\ncm0_img_id = {cm0_img_id}\ncm4_img_id = {cm4_img_id}\nelf = {elf}\nm4hex = {m4hex}\nm0hex = {m0hex}\n")
     # Keep module import here so it is required only if building PSOC6 targets
     # that need to be signed
 
@@ -190,6 +180,15 @@ def sign_image(
         m0hex_build = os.path.join(build_dir, m0hex_filename)
         copy2(m0hex, m0hex_build)
         m0hex = m0hex_build
+
+    # Mapping from mbed target to cysecuretools target
+    TARGET_MAPPING = {
+            "CY8CKIT064B0S2_4343W": "cy8ckit-064b0s2-4343w",
+            "CYTFM_064B0S2_4343W"  : "cy8ckit-064b0s2-4343w",
+            "CY8CPROTO_064B0S1_BLE": "cy8cproto-064b0s1-ble",
+            "CY8CPROTO_064S1_SB"   : "cy8cproto-064s1-sb",
+            "CY8CPROTO_064B0S3"    : "cy8cproto-064b0s3"
+    }
 
     try:
         secure_target = TARGET_MAPPING[target_name]
@@ -271,7 +270,7 @@ def find_policy(policy, message_func, target_name=None):
             if not os.path.exists(str(policy_file)):
                 policy_file = MBED_OS_ROOT / "mbed-os" / default_path
 
-    print(f"policy_file = ${policy_file}")
+
     if os.path.exists(str(policy_file)):
         message_func("Policy file found: %s." % policy_file)
     else:
@@ -279,6 +278,7 @@ def find_policy(policy, message_func, target_name=None):
         raise ConfigException("Required policy file not found.")
 
     return policy_file
+
 
 
 def complete(message_func, elf0, hexf0, hexf1=None):

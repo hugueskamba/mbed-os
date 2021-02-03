@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright (c) 2017-2020 Arm Limited
+# Copyright (c) 2017-2021 Arm Limited
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -37,11 +37,10 @@ from tools.psa.tfm.bin_utils.assemble import Assembly
 from tools.psa.tfm.bin_utils.imgtool import do_sign
 from tools.psa.tfm.bin_utils.imgtool_lib import version
 
-
 MUSCA_S1_BASE = path_join(MBED_OS_ROOT, 'targets', 'TARGET_ARM_SSG', 'TARGET_MUSCA_S1')
 
 
-def musca_tfm_bin(non_secure_bin, secure_bin):
+def musca_tfm_bin(t_self, non_secure_bin, secure_bin):
 
     assert os.path.isfile(secure_bin)
     assert os.path.isfile(non_secure_bin)
@@ -148,4 +147,4 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    musca_tfm_bin(args.non_secure_bin, args.secure_bin)
+    musca_tfm_bin(None, args.non_secure_bin, args.secure_bin)
