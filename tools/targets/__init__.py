@@ -594,12 +594,10 @@ class PSOC6Code(object):
         cortex_m0_hex_file = None
 
         if hasattr(t_self.target, "hex_filename"):
-            hex_filename = t_self.target.hex_filename
-
             from tools.targets.PSOC6 import find_cm0_image
             # Completing main image involves merging M0 image.
             cortex_m0_hex_file = find_cm0_image(
-                notification.info, resources, hex_filename
+                notification.info, resources, t_self.target.hex_filename
             )
 
         psoc6code_merge_images(
@@ -615,32 +613,26 @@ class PSOC6Code(object):
         """
         from tools.binary_manipulation import psoc6code_add_signature_to_image
 
-        hex_filename = None
-        cortex_m0_hex_file = None
-
         if hasattr(t_self.target, "hex_filename"):
             from targets.PSOC6 import find_cm0_image
-
-            hex_filename = t_self.target.hex_filename
-
             # Completing main image involves merging M0 image.
             cortex_m0_hex_file = find_cm0_image(
-                t_self.notify.info, resources, hex_filename
+                t_self.notify.info, resources, t_self.target.hex_filename
             )
 
-        psoc6code_add_signature_to_image(
-            t_self.build_dir,
-            t_self.target.name,
-            t_self.target.policy_file,
-            t_self.target.boot_scheme,
-            t_self.target.cm0_img_id,
-            t_self.target.cm4_img_id,
-            binf,
-            elf,
-            t_self.notify,
-            hex_filename,
-            cortex_m0_hex_file
-        )
+            psoc6code_add_signature_to_image(
+                t_self.build_dir,
+                t_self.target.name,
+                t_self.target.policy_file,
+                t_self.target.boot_scheme,
+                t_self.target.cm0_img_id,
+                t_self.target.cm4_img_id,
+                binf,
+                elf,
+                t_self.notify,
+                t_self.target.hex_filename,
+                cortex_m0_hex_file
+            )
 
 
 class ArmMuscaA1Code(object):

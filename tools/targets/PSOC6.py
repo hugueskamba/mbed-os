@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 
+import argparse
+import logging
 import os
 import sys
 import subprocess
@@ -25,6 +27,12 @@ from shutil import copy2
 import json
 from intelhex import IntelHex, hex2bin, bin2hex
 from pathlib import Path
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+MBED_OS_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, os.pardir, os.pardir))
+
+# Ensure the tools module is visible to this script
+sys.path.insert(0, MBED_OS_ROOT)
 
 from tools.config import ConfigException
 
@@ -138,32 +146,32 @@ def complete_func(message_func, elf0, hexf0, hexf1=None, dest=None):
 
 
 # Find Cortex M0 image.
-def find_cm0_image(message_func, resources, hex_filename):
-    if hex_filename is None:
+def find_cm0_image(message_func, resources, m0hex_filename):
+    if m0hex_filename is None:
         return None
     # Locate user-specified image
     from tools.resources import FileType
     hex_files = resources.get_file_paths(FileType.HEX)
-    m0hexf = next((f for f in hex_files if os.path.basename(f) == hex_filename), None)
+    m0hexf = next((f for f in hex_files if os.path.basename(f) == m0hex_filename), None)
 
     if m0hexf:
         message_func("M0 core image file found: %s." % m0hexf)
     else:
-        message_func("M0 core hex image file %s not found. Aborting." % hex_filename)
+        message_func("M0 core hex image file %s not found. Aborting." % m0hex_filename)
         raise ConfigException("Required M0 core hex image not found.")
 
     return m0hexf
 
 
 def sign_image(
-    build_dir, hex_filename, target_name, policy, notification, boot_scheme,
-    cm0_img_id, cm4_img_id, elf, binf, m0hex
+    build_dir, m0hex_filename, target_name, policy, notification, boot_scheme,
+    cm0_img_id, cm4_img_id, elf, m4hex, m0hex
 ):
     """
     Adds signature to a binary file being built,
     using cysecuretools python package.
     :param build_dir: The build directory
-    :param hex_filename: A HEX file
+    :param m0hex_filename: The file name of the Cortex-M0 hex
     :param target_name: The name of the Mbed target
     :param policy: The path to the policy file
     :param notification: The object to output notification with
@@ -171,15 +179,15 @@ def sign_image(
     :param cm0_img_id: The Cortex-M0 image identifier
     :param cm4_img_id: The Cortex-M4 image identifier
     :param elf: An ELF file
-    :param binf: Binary file created for target
-    :param m0hex: The Cortex-M0 HEX file
+    :param m4hex: The path to the Cortex-M4 HEX file
+    :param m0hex: The path to the Cortex-M0 HEX file
     """
-
+    print(f"build_dir = {build_dir}\nm0hex_filename = {m0hex_filename}\ntarget_name = {target_name}\npolicy = {policy}\nboot_scheme = {boot_scheme}\ncm0_img_id = {cm0_img_id}\ncm4_img_id = {cm4_img_id}\nelf = {elf}\nm4hex = {m4hex}\nm0hex = {m0hex}\n")
     # Keep module import here so it is required only if building PSOC6 targets
     # that need to be signed
 
     if m0hex != '':
-        m0hex_build = os.path.join(build_dir, hex_filename)
+        m0hex_build = os.path.join(build_dir, m0hex_filename)
         copy2(m0hex, m0hex_build)
         m0hex = m0hex_build
 
@@ -201,13 +209,13 @@ def sign_image(
 
     if str(boot_scheme) == 'single_image':
         notification.info("[PSOC6.sign_image] single image signing")
-        sign_application(notification.debug, tools, binf, image_id=cm0_img_id)
+        sign_application(notification.debug, tools, m4hex, image_id=cm0_img_id)
 
     elif str(boot_scheme) == 'multi_image':
         sign_application(notification.debug, tools, m0hex, image_id=cm0_img_id)
-        sign_application(notification.debug, tools, binf, image_id=cm4_img_id)
+        sign_application(notification.debug, tools, m4hex, image_id=cm4_img_id)
 
-        complete(notification.debug, elf, hexf0=binf, hexf1=m0hex)
+        complete(notification.debug, elf, hexf0=m4hex, hexf1=m0hex)
 
     else:
         raise ConfigException("[PSOC6.sign_image] Boot scheme " + str(boot_scheme) + \
@@ -239,9 +247,6 @@ def find_policy(policy, message_func, target_name=None):
     :param message_func: Function to print a status information
     :param target_name: Name of the Mbed target
     """
-
-    mbed_os_root = Path(os.getcwd())
-    
     policy_path = Path(policy)
 
     # Absolute path provided
@@ -250,7 +255,7 @@ def find_policy(policy, message_func, target_name=None):
 
     # May also be relative to mbed-os file scturcture
     else:
-        policy_path = mbed_os_root / policy_path
+        policy_path = MBED_OS_ROOT / policy_path
 
         if os.path.exists(str(policy_path)):
             policy_file = policy_path
@@ -261,12 +266,12 @@ def find_policy(policy, message_func, target_name=None):
                                 policy
 
             # Consider default location
-            policy_file = mbed_os_root / default_path
+            policy_file = MBED_OS_ROOT / default_path
             
             if not os.path.exists(str(policy_file)):
-                policy_file = mbed_os_root / "mbed-os" / default_path
+                policy_file = MBED_OS_ROOT / "mbed-os" / default_path
 
-
+    print(f"policy_file = ${policy_file}")
     if os.path.exists(str(policy_file)):
         message_func("Policy file found: %s." % policy_file)
     else:
@@ -276,9 +281,97 @@ def find_policy(policy, message_func, target_name=None):
     return policy_file
 
 
-
 def complete(message_func, elf0, hexf0, hexf1=None):
     """
     Merge CM4 and CM0 images to a single binary
     """
     complete_func(message_func, elf0, hexf0, hexf1)
+
+
+def merge_action(args):
+    """Entry point for the "merge" CLI command."""
+    complete(
+        logging.getLogger(__name__).debug, args.elf, args.m4hex, args.m0hex
+    )
+
+
+def sign_action(args):
+    """Entry point for the "sign" CLI command."""
+    sign_image(
+        args.build_dir,
+        args.m0hex_filename,
+        args.target_name,
+        args.policy_file_name,
+        logging.getLogger(__name__),
+        args.boot_scheme,
+        args.cm0_img_id,
+        args.cm4_img_id,
+        args.elf,
+        args.m4hex,
+        args.m0hex
+    )
+
+
+def parse_args():
+    """Parse the command line arguments."""
+    parser = argparse.ArgumentParser(
+        description="PSOC6 post build application."
+    )
+
+    subcommands = parser.add_subparsers(description="The action to perform.")
+
+    merge_subcommand = subcommands.add_parser(
+        "merge", help="Merge Cortex-M4 and Cortex-M0 HEX files."
+    )
+    merge_subcommand.add_argument(
+        "--elf", required=True, help="the application ELF file."
+    )
+    merge_subcommand.add_argument(
+        "--m4hex", required=True, help="the path to the Cortex-M4 HEX to merge."
+    )
+    merge_subcommand.add_argument(
+        "--m0hex", help="the path to the Cortex-M0 HEX to merge."
+    )
+    merge_subcommand.set_defaults(func=merge_action)
+
+    sign_subcommand = subcommands.add_parser(
+        "sign", help="Sign a Cortex-M4 HEX files."
+    )
+    sign_subcommand.add_argument(
+        "--build-dir", required=True, help="the build directory."
+    )
+    sign_subcommand.add_argument(
+        "--m0hex-filename", required=True, help="the name of the HEX file."
+    )
+    sign_subcommand.add_argument(
+        "--target-name", help="the Mbed target name."
+    )
+    sign_subcommand.add_argument(
+        "--policy-file-name", help="the name of the policy file."
+    )
+    sign_subcommand.add_argument(
+        "--boot-scheme", help="the boot scheme."
+    )
+    sign_subcommand.add_argument(
+        "--cm0-img-id", help="the Cortex-M0 image ID."
+    )
+    sign_subcommand.add_argument(
+        "--cm4-img-id", help="the Cortex-M4 image ID."
+    )
+    sign_subcommand.add_argument(
+        "--elf", required=True, help="the application ELF file."
+    )
+    sign_subcommand.add_argument(
+        "--m4hex", required=True, help="the path to the Cortex-M4 HEX to merge."
+    )
+    sign_subcommand.add_argument(
+        "--m0hex", help="the path to the Cortex-M0 HEX to merge."
+    )
+    sign_subcommand.set_defaults(func=sign_action)
+
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    args.func(args)

@@ -133,7 +133,7 @@ def psoc6code_merge_images(
 
 def psoc6code_add_signature_to_image(
     build_dir, target_name, policy, boot_scheme, cortex_m0_img_id,
-    cortex_m4_img_id, binary, elf_file, notification, hex_file=None,
+    cortex_m4_img_id, cortex_m4_hex_file, elf_file, notification, hex_file=None,
     cortex_m0_hex_file=None
 ):
     """Add a signature to the image."""
@@ -150,7 +150,7 @@ def psoc6code_add_signature_to_image(
             cortex_m0_img_id,
             cortex_m4_img_id,
             elf_file,
-            binary,
+            cortex_m4_hex_file,
             cortex_m0_hex_file
         )
 
