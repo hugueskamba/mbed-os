@@ -19,13 +19,25 @@ import os
 from os.path import abspath, basename, dirname, splitext, isdir
 from os.path import join as path_join
 import re
-from argparse import Namespace
+import sys
+from argparse import ArgumentParser, Namespace
+
+SCRIPT_DIR = dirname(abspath(__file__))
+MBED_OS_ROOT = abspath(path_join(SCRIPT_DIR, os.pardir, os.pardir))
+
+# Ensure the tools module is visible to this script
+sys.path.insert(0, MBED_OS_ROOT)
+
+TFM_SCRIPTS = abspath(path_join(dirname(__file__), '..', 'psa', 'tfm', 'bin_utils'))
+
+# Ensure the psa module is visible to this script
+sys.path.insert(0, TFM_SCRIPTS)
+
 from tools.psa.tfm.bin_utils.assemble import Assembly
 from tools.psa.tfm.bin_utils.imgtool import do_sign
 from tools.psa.tfm.bin_utils.imgtool_lib import version
 
-SCRIPT_DIR = dirname(abspath(__file__))
-MBED_OS_ROOT = abspath(path_join(SCRIPT_DIR, os.pardir, os.pardir))
+
 MUSCA_B1_BASE = path_join(MBED_OS_ROOT, 'targets', 'TARGET_ARM_SSG', 'TARGET_MUSCA_B1')
 
 
@@ -109,3 +121,31 @@ def find_bl2_size(configFile):
                 bl2_size = int(m.group(1), 0)
                 break
     return bl2_size
+
+
+def parse_args():
+    """Parse the command line arguments."""
+    parser = ArgumentParser(
+        description="Merge ARM MUSCA B1 secure and non-secure images."
+    )
+
+    parser.add_argument(
+        "--non-secure-bin",
+        type=str,
+        required=True,
+        help="the secure binary image.",
+    )
+
+    parser.add_argument(
+        "--secure-bin",
+        type=str,
+        required=True,
+        help="the secure binary image.",
+    )
+
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    musca_tfm_bin(args.non_secure_bin, args.secure_bin)
