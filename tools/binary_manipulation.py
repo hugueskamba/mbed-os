@@ -119,15 +119,14 @@ def rtl8195a_convert_elf_to_bin(toolchain, elf, binary):
 
 
 def psoc6code_merge_images(
-    binary, elf_file, notification, cortex_m0_hex_file=None, hex_file=None
+    cortex_m4_hex_file, elf_file, notification, cortex_m0_hex_file=None
 ):
-    """Merge the ELF file and the binary file."""
+    """Merge the cortex m4 and cortex m0 HEX files."""
     from targets.PSOC6 import complete as psoc6_complete
-
     psoc6_complete(
         notification.debug,
         elf_file,
-        binary,
+        cortex_m4_hex_file,
         cortex_m0_hex_file
     )
 

@@ -591,7 +591,6 @@ class PSOC6Code(object):
         """Complete the build process."""
         from tools.binary_manipulation import psoc6code_merge_images
 
-        hex_filename = None
         cortex_m0_hex_file = None
 
         if hasattr(t_self.target, "hex_filename"):
@@ -600,11 +599,11 @@ class PSOC6Code(object):
             from tools.targets.PSOC6 import find_cm0_image
             # Completing main image involves merging M0 image.
             cortex_m0_hex_file = find_cm0_image(
-                notification.info, resources, hex_file
+                notification.info, resources, hex_filename
             )
 
         psoc6code_merge_images(
-            binf, elf, t_self.notify, cortex_m0_hex_file, hex_filename
+            binf, elf, t_self.notify, cortex_m0_hex_file
         )
 
 
