@@ -137,18 +137,18 @@ def complete_func(message_func, elf0, hexf0, hexf1=None, dest=None):
 
 
 # Find Cortex M0 image.
-def find_cm0_image(message_func, resources, m0hex_filename):
-    if m0hex_filename is None:
+def find_cm0_image(toolchain, resources, elf, hexf, hex_filename):
+    if hex_filename is None:
         return None
     # Locate user-specified image
     from tools.resources import FileType
     hex_files = resources.get_file_paths(FileType.HEX)
-    m0hexf = next((f for f in hex_files if os.path.basename(f) == m0hex_filename), None)
+    m0hexf = next((f for f in hex_files if os.path.basename(f) == hex_filename), None)
 
     if m0hexf:
-        message_func("M0 core image file found: %s." % m0hexf)
+        toolchain.notify.info("M0 core image file found: %s." % m0hexf)
     else:
-        message_func("M0 core hex image file %s not found. Aborting." % m0hex_filename)
+        toolchain.notify.info("M0 core hex image file %s not found. Aborting." % hex_filename)
         raise ConfigException("Required M0 core hex image not found.")
 
     return m0hexf
