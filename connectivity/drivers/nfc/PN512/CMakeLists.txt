@@ -1,7 +1,9 @@
-# Copyright (c) 2020 ARM Limited. All rights reserved.
+# Copyright (c) 2020-2021 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-target_include_directories(mbed-nfc
+add_library(mbed-nfc-pn512 INTERFACE)
+
+target_include_directories(mbed-nfc-pn512
     INTERFACE
         ./include
         ./include/nfc
@@ -10,7 +12,7 @@ target_include_directories(mbed-nfc
         ./source/transceiver
 )
 
-target_sources(mbed-nfc
+target_sources(mbed-nfc-pn512
     INTERFACE
         source/PN512Driver.cpp
         source/PN512SPITransportDriver.cpp
@@ -26,3 +28,5 @@ target_sources(mbed-nfc
         source/transceiver/pn512_timer.c
         source/transceiver/pn512_transceive.c
 )
+
+target_link_libraries(mbed-nfc PRIVATE mbed-nfc-pn512)

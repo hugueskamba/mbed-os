@@ -1,7 +1,6 @@
-# Copyright (c) 2020 ARM Limited. All rights reserved.
+# Copyright (c) 2020-2021 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# List of all connectivity libraries available.
 add_library(mbed-802.15.4-rf INTERFACE)
 add_library(mbed-ble INTERFACE)
 add_library(mbed-ble-blue_nrg INTERFACE)
@@ -22,14 +21,12 @@ add_library(mbed-nanostack-sal_stack INTERFACE)
 add_library(mbed-nanostack-sal_stack-event_loop INTERFACE)
 add_library(mbed-nanostack-libservice INTERFACE)
 add_library(mbed-netsocket INTERFACE)
-add_library(mbed-nfc INTERFACE)
 add_library(mbed-ppp INTERFACE)
 add_library(mbed-wifi INTERFACE)
 
 
 add_subdirectory(FEATURE_BLE)
 add_subdirectory(cellular)
-add_subdirectory(drivers)
 add_subdirectory(libraries)
 add_subdirectory(lorawan)
 add_subdirectory(lwipstack)
@@ -37,3 +34,5 @@ add_subdirectory(mbedtls)
 add_subdirectory(nanostack)
 add_subdirectory(netsocket)
 add_subdirectory(nfc)
+
+add_subdirectory(drivers)
